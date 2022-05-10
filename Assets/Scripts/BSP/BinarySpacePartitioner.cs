@@ -12,7 +12,7 @@ public class BinarySpacePartitioner
         this.rootnode = new RoomNode(new Vector2Int(0, 0), new Vector2Int(dungeonWidth, dungeonLength), null, 0);
     }
 
-    public List<RoomNode> PreparenodesCollection(int maxIterations, int roomWidthMin, int roomLengthMin)
+    public List<RoomNode> PrepareNodesCollection(int maxIterations, int roomWidthMin, int roomLengthMin)
     {
         Queue<RoomNode> graph = new Queue<RoomNode>();
         List<RoomNode> listToReturn = new List<RoomNode>();  
@@ -33,7 +33,6 @@ public class BinarySpacePartitioner
 
     void SplitTheSpace(RoomNode currentNode, List<RoomNode> listToReturn, int roomLengthMin, int roomWidthMin, Queue<RoomNode> graph)
     {
-
         Line line = GetLineDividingSpace(
             currentNode.BottomLeftCorner, 
             currentNode.TopRightCorner, 

@@ -156,8 +156,14 @@ MonoBehaviour:
   dungeonLength: 100
   roomWidthMin: 25
   roomLengthMin: 25
-  maxIterations: 1
+  maxIterations: 6
   hallWayWidth: 5
+  material: {fileID: 2100000, guid: 09b8333152099934c80c48e5c983e26f, type: 2}
+  roomBottomCornerModifier: 0.195
+  roomTopCornerModifier: 0.973
+  roomOffset: 2
+  WallZAxis: {fileID: 6826314174814723474, guid: 17486bbae0d5f0649940b8f6a1804762, type: 3}
+  WallXAxis: {fileID: 6826314174814723474, guid: 1abd699ea018b1c48aa7ee86fbef6b90, type: 3}
 --- !u!4 &134606051
 Transform:
   m_ObjectHideFlags: 0
@@ -341,10 +347,10 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: 0.23398341, y: 0.6775881, z: -0.24254046, w: 0.6536821}
+  m_LocalPosition: {x: -16.4, y: 35.19, z: 42.86}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 39.389, y: 92.058, z: 0}
