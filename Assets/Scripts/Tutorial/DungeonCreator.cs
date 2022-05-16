@@ -61,7 +61,7 @@ public class DungeonCreator : MonoBehaviour
         CreateWalls(wallParent);
     }
 
-    private void CreateWalls(GameObject wallParent)
+    void CreateWalls(GameObject wallParent)
     {
         foreach (var wallPos in WallHorizPos)
         {
@@ -156,12 +156,12 @@ public class DungeonCreator : MonoBehaviour
         }
         else
             wallList.Add(point);
-        
+
     }
 
     void DestroyAllChildren()
     {
-        while(transform.childCount != 0)
+        while (transform.childCount != 0)
         {
             foreach (Transform item in transform)
             {
