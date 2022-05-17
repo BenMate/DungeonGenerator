@@ -10,14 +10,16 @@ public class ProceduralDungeonGen : MonoBehaviour
     public int height = 400;
 
     BSPNode root;
-    public const int max_node_size = 50;
+
+   
+    public const int max_node_size = 4;
     List<BSPNode> nodes = new List<BSPNode>();
+   
 
     // Start is called before the first frame update
     void Start()
     {
         CreateRooms();
-
 
     }
 
@@ -47,14 +49,15 @@ public class ProceduralDungeonGen : MonoBehaviour
                             //if we have did split, add child nodes
                             nodes.Add(nodes[i].leftNode);
                             nodes.Add(nodes[i].rightNode);
+                       
                             didSplit = true;
                         }
                     }
                 }
             }
         }
-
-        root.GenerateRoom();
+        //iterate through each leaf and create a room in each one
+       root.GenerateRoom();
     }
 
 
