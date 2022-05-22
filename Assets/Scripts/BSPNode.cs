@@ -5,8 +5,14 @@ using System.Drawing;
 public class BSPNode
 {
     //children dimensions
-    public int x, y, z, width, height, scale;
+    public int x, y, z, width, length, height, scale;
     public int minNodeSize = 50;
+
+    public int roomW;
+    public int roomH;
+
+    public int extraHallwayWidth;
+    public int extraHallwayHeight;
 
     //public node data
     public BSPNode leftNode;
@@ -17,38 +23,43 @@ public class BSPNode
 
     public Rectangle room;
 
-    GameObject box;
+    public GameObject floor;
 
     List<Rectangle> hallways = new List<Rectangle>(); //hallways
 
 
     //default Constructor
-    public BSPNode(int a_x, int a_y, int a_width, int a_height)
+    public BSPNode(GameObject a_floor, int a_x, int a_y, int a_width, int a_Length, int a_height, int a_minNodeSize, int a_roomOffSetW, int a_roomOffSetH, int a_hallWayWidth, int a_hallwayHeight)
     {
-        //x,y position
+        //prefab
+        floor = a_floor;
+
         x = a_x;
         y = a_y;
-       
+
+        //dungeon values
         width = a_width;
+        length = a_Length;
         height = a_height;
-       
+
+        //min node size
+        minNodeSize = a_minNodeSize;
+
+        //room values
+        roomW = a_roomOffSetW;
+        roomH = a_roomOffSetH;
         hasRoom = false;
 
-        //spawn objects
-        box = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        box.transform.position = new Vector3(x + (width * 0.5f), y + (height * 0.5f), 0.0f);
-        box.transform.localScale = new Vector3(width, height, 1.0f);
-
-        //random Colour 
-        UnityEngine.Color randColor = new UnityEngine.Color(Random.Range(0, 1.0f),
-            Random.Range(0, 1.0f), Random.Range(0, 1.0f), 1.0f);
-        box.GetComponent<Renderer>().material.color = randColor;
-
+        //hallway values
+        extraHallwayHeight = a_hallwayHeight;
+        extraHallwayWidth = a_hallWayWidth;  
     }
 
     public bool BSPSplit()
     {
-        //if leaf already has children skip over
+
+        
+        //if node already has children skip over
         if (leftNode != null || rightNode != null)
             return false;
 
@@ -56,14 +67,14 @@ public class BSPNode
         bool horizontal = Random.Range(0.0f, 1.0f) < 0.5f;
 
         //if the room is wider than it is tall, split vert instead 
-        if (width > height && height / width >= 0.5f)
+        if (width > length && length / width >= 0.5f)
             horizontal = false;
 
-        else if (height > width && width / height >= 0.5f)
+        else if (length > width && width / length >= 0.5f)
             horizontal = true;
 
-        //determine the max size of the new leaf
-        int max = (horizontal ? height : width) - minNodeSize;
+        //determine the max height or width
+        int max = (horizontal ? length : width) - minNodeSize;
 
         //if its to small, dont split
         if (max <= minNodeSize)
@@ -75,19 +86,13 @@ public class BSPNode
         //split
         if (horizontal)
         {
-            leftNode = new BSPNode(x, y, width, split);
-            rightNode = new BSPNode(x, y + split, width, height - split);
+            leftNode = new BSPNode(floor, x, y, width, split, height, minNodeSize, roomW, roomH, extraHallwayWidth, extraHallwayHeight);
+            rightNode = new BSPNode(floor, x, y + split, width, length - split, height, minNodeSize, roomW, roomH, extraHallwayWidth, extraHallwayHeight);
         }
         else //vertical
         {
-            leftNode = new BSPNode(x, y, split, height);
-            rightNode = new BSPNode(x + split, y, width - split, height);
-        }
-
-        if (box != null)
-        {
-            GameObject.Destroy(box);
-            box = null;
+            leftNode = new BSPNode(floor, x, y, split, length, height, minNodeSize, roomW, roomH, extraHallwayWidth, extraHallwayHeight);
+            rightNode = new BSPNode(floor, x + split, y, width - split, length, height, minNodeSize, roomW, roomH, extraHallwayWidth, extraHallwayHeight);
         }
 
         //return true if split happened   
@@ -98,31 +103,41 @@ public class BSPNode
     {
         if (leftNode != null || rightNode != null)
         {
-            //checks left node for children, if there is one create a room
+            //Creates Lft rooms
             if (leftNode != null)
                 leftNode.GenerateRoom();
 
-            //check right node for children, if there is one create a room
+            //Creates Right rooms
             if (rightNode != null)
                 rightNode.GenerateRoom();
 
-            //if there are children on both left and right, create a hallway between both rooms
-            if (leftNode != null && rightNode != null)
+            //Generates Hallways
+            if (leftNode != null || rightNode != null)
                 CreateHalls(leftNode.GetRoom(), rightNode.GetRoom());
+
+            //generate walls
+
 
             hasRoom = false;
         }
         else
-        {
-            Vector2 roomSize;
-            Vector2 roomPos;
-            roomSize = new Vector2(Random.Range(3, width - 2), Random.Range(3, height - 2));
-            roomPos = new Vector2(Random.Range(2, width - roomSize.x - 2), Random.Range(2, height - roomSize.y - 2));
-            room = new Rectangle((int)(x + roomPos.x), (int)(y + roomPos.y), (int)roomSize.x, (int)roomSize.y);
-      
+        {         
+            Vector2 roomSize = new Vector2(width - roomW, length - roomH); //actual size of room 
+            Vector2 newRoomPos = new Vector2(Random.Range(1, width - roomSize.x - 1), Random.Range(3, length - roomSize.y - 1));
+
+            room = new Rectangle((int)(x + newRoomPos.x), (int)(y + newRoomPos.y), (int)roomSize.x, (int)roomSize.y);
+
             hasRoom = false;
         }
-
+            
+        //generate floor prefab
+        floor = GameObject.Instantiate(floor);
+        //position
+        floor.transform.position = new Vector3(room.X + (room.Width * 0.5f), height, room.Y + (room.Height * 0.5f));
+        //scale
+        floor.transform.localScale = new Vector3(room.Width, 1.0f, room.Height);
+        //colour
+        floor.GetComponent<Renderer>().material.color = UnityEngine.Color.gray;
     }
 
     public Rectangle GetRoom()
@@ -150,36 +165,34 @@ public class BSPNode
             else if (lRoom == null)
                 return rRoom;
 
-            //50% to returrn left
-            else if (Random.Range(0.0f, 1.0f) > 0.5)
+            else if (Random.Range(0.0f, 1.0f) > 0.5)//50% to returrn left
                 return lRoom;
 
             else
                 return rRoom;
         }
         return room;
- 
-    }
 
+    }
 
     public void CreateHalls(Rectangle leftRoom, Rectangle rightRoom)
     {
-        //we now Create a hall in between the 2 rooms
+        //Creates a hall in between the 2 rooms
 
         //create a new list
         hallways = new List<Rectangle>();
 
         //get 2 random points from each room
-        
+
         Vector2 point1 = new Vector2(Random.Range(
             leftRoom.Left + 1,
-            leftRoom.Right - 2),Random.Range(
-            leftRoom.Top + 1, 
+            leftRoom.Right - 2), Random.Range(
+            leftRoom.Top + 1,
             leftRoom.Bottom - 2));
 
         Vector2 point2 = new Vector2(Random.Range(
             rightRoom.Left + 1,
-            rightRoom.Right - 2),Random.Range(
+            rightRoom.Right - 2), Random.Range(
             rightRoom.Top + 1,
             rightRoom.Bottom - 2));
 
@@ -192,7 +205,7 @@ public class BSPNode
             {
                 if (Random.Range(0.0f, 1.0f) < 0.5) //50%
                 {
-                    
+
                     hallways.Add(new Rectangle((int)point2.x, (int)point1.y, Mathf.Abs(width), 1));
                     hallways.Add(new Rectangle((int)point2.x, (int)point2.y, 1, Mathf.Abs(height)));
                 }
@@ -265,8 +278,33 @@ public class BSPNode
             }
 
         }
+
+        SpawnHallways();
+
     }
 
+
+    public void SpawnHallways()
+    {
+        //Create hallways
+        for (int i = 0; i < hallways.Count; i++)
+        {
+            floor = GameObject.CreatePrimitive(PrimitiveType.Cube);
+
+            //position
+            floor.transform.position = new Vector3(hallways[i].X + (hallways[i].Width * 0.5f), height, hallways[i].Y + (hallways[i].Height * 0.5f));
+
+            //scale extra
+            int extraWidth = (hallways[i].Width > hallways[i].Height ? 0 : extraHallwayHeight); //if there is less width, scale more width
+            int extraHeight = (hallways[i].Height > hallways[i].Width ? 0 : extraHallwayWidth); // if there is less height, scale more height
+
+            //scale
+            floor.transform.localScale = new Vector3(hallways[i].Width + extraWidth, 1.0f, hallways[i].Height + extraHeight);
+
+            //colour
+            floor.GetComponent<Renderer>().material.color = UnityEngine.Color.white; //temp colour
+        }
+    }
 
 
 
