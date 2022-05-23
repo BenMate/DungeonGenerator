@@ -5,9 +5,11 @@ using UnityEngine;
 public class DungeonGenerator : MonoBehaviour
 {
     public int corridorLength = 10;
+
     public int roomCount = 5;
     [Range(0, 100)] //0-100 chance of generating a room
     public int roomChance = 50;
+    public int maxCorridorSegments = 2; //set a max amount of times rooms cannot be generated.
 
     Dictionary<Vector3, Node> knownPositions = new Dictionary<Vector3, Node>();
 
@@ -15,15 +17,21 @@ public class DungeonGenerator : MonoBehaviour
     Node currentNode;
 
     int nodeCount = 1;
+    
 
     List<Node> deletedNodes = new List<Node>();
 
     void Start()
     {
-        //add a root node, also add it to known positions
+        //add a root node, also add to known positions
         root = new Node(Vector3.zero);
         knownPositions.Add(root.position, root);
         currentNode = root;
+
+        //the count of each time a room isnt generated.
+        int segmentCount = 0; 
+
+        //set the max possible times isRoom can be false in a row
 
         while (nodeCount < roomCount)
         {
@@ -34,17 +42,16 @@ public class DungeonGenerator : MonoBehaviour
             if (knownPositions.ContainsKey(newPos))
             {
                 currentNode = knownPositions[newPos];
+                segmentCount++;
                 continue;
             }
 
             //generate a new node with:
-            //a new position and parent
-            //ability to have a room.
+            //a new position a parent and an ability to have a room.
             Node newNode = new Node(newPos);
-            newNode.isRoom = Random.Range(0, 100) < roomChance;
+            newNode.isRoom = Random.Range(0, 100) < roomChance || segmentCount >= maxCorridorSegments - 1; 
             currentNode.children.Add(newNode);
             newNode.parent = currentNode;
-
 
             //add new position to known positions
             knownPositions.Add(newPos, newNode);
@@ -54,7 +61,14 @@ public class DungeonGenerator : MonoBehaviour
 
             //update node count if generated in a room
             if (newNode.isRoom)
+            {
                 nodeCount++;
+                segmentCount = 0;
+            }
+            else
+            {
+                segmentCount++;
+            }                         
         }
 
         List<Node> leafNodes = new List<Node>();
@@ -63,8 +77,7 @@ public class DungeonGenerator : MonoBehaviour
         foreach (Node leaf in leafNodes)
             RemoveDeadEnd(leaf);
 
-        //temp
-        print(nodeCount);
+        print(nodeCount);   
     }
 
     void RemoveDeadEnd(Node node)
@@ -128,6 +141,7 @@ public class Node
 
     public Node parent = null;
 
+    //room data
     public bool isRoom = true;
 
     public Node(Vector3 position)

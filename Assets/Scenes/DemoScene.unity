@@ -310,7 +310,7 @@ GameObject:
   - component: {fileID: 1185741375}
   - component: {fileID: 1185741374}
   m_Layer: 0
-  m_Name: Test
+  m_Name: DungeonGenDemo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -329,8 +329,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   corridorLength: 10
-  roomCount: 10
-  roomChance: 15
+  roomCount: 50
+  roomChance: 6
+  maxIsntRoomLimit: 3
 --- !u!4 &1185741375
 Transform:
   m_ObjectHideFlags: 0
