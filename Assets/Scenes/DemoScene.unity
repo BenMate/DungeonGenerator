@@ -329,9 +329,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   corridorLength: 10
-  roomCount: 50
-  roomChance: 6
-  maxIsntRoomLimit: 3
+  roomCount: 10
+  roomChance: 61
+  maxCorridorSegments: 2
+  corridorFloor: {fileID: 1949073592566165718, guid: 13093b83171939548952a3ce21bd3c27, type: 3}
+  genSpeed: 1
 --- !u!4 &1185741375
 Transform:
   m_ObjectHideFlags: 0
