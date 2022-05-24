@@ -328,12 +328,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83fff389a1e9c694b9e61f37c0788c00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  corridorLength: 10
-  roomCount: 10
-  roomChance: 61
-  maxCorridorSegments: 2
+  corridorLength: 20
+  roomCount: 16
+  roomChance: 22
+  maxCorridorSegments: 3
   corridorFloor: {fileID: 1949073592566165718, guid: 13093b83171939548952a3ce21bd3c27, type: 3}
-  genSpeed: 1
+  roomPrefab: {fileID: 2295085706261190550, guid: 9ee99d91bb1cd144aa544adfe211218b, type: 3}
+  genSpeed: 0.93
 --- !u!4 &1185741375
 Transform:
   m_ObjectHideFlags: 0

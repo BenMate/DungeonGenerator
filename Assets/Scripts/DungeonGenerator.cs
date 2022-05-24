@@ -4,12 +4,21 @@ using UnityEngine;
 
 public class DungeonGenerator : MonoBehaviour
 {
+    [Header("Debug")]
+    [Tooltip("The Total Length of the corridors")]
+    [Range(5.0f, 100.0f)]
     public int corridorLength = 10;
 
+    [Tooltip("The Total Amount of Rooms That Will Be Generated")]
+    [Range(1, 100)]
     public int roomCount = 5;
-    [Range(0, 100)] //0-100 chance of generating a room
+
+    [Tooltip("The chance of Generating A Room")]
+    [Range(0, 100)]
     public int roomChance = 50;
-    public int maxCorridorSegments = 2; //set a max amount of times rooms cannot be generated.
+
+    [Tooltip("Max Amount of Times Rooms Can have segments between them")]
+    public int maxCorridorSegments = 2;
 
     [Header("GameObjects")]
     public GameObject corridorFloor;
@@ -20,6 +29,7 @@ public class DungeonGenerator : MonoBehaviour
     public float genSpeed = 1.0f;
 
     Dictionary<Vector3, Node> knownPositions = new Dictionary<Vector3, Node>();
+    List<Node> deletedNodes = new List<Node>(); //testing which nodes got deleted
 
     Node root;
     Node currentNode;
@@ -27,52 +37,66 @@ public class DungeonGenerator : MonoBehaviour
     int totalRooms = 1;
     int nodeCount = 0;
 
-    List<Node> deletedNodes = new List<Node>();
-
     void Start()
     {
 
-        GenerateDungeon();
+        StartCoroutine(GenerateDungeon());
 
     }
 
-    void GenerateDungeon()
+    IEnumerator GenerateDungeon()
     {
-        StartCoroutine(GenerateNodes());
-        GenerateCorridors();
-        GenerateRooms();
+        yield return StartCoroutine(GenerateNodes());
+        yield return StartCoroutine(GenerateRooms());
+        yield return StartCoroutine(GenerateCorridors());
 
-        print($"Total Generated Rooms : {totalRooms}\nTotal Generated Corridors : {nodeCount}");
+        print($"Total Generated Rooms : {totalRooms} \nTotal Generated Corridors : {nodeCount}");
     }
 
-    void GenerateCorridors()
+    IEnumerator GenerateCorridors()
     {
-        GenerateCorridor(root);
-
+        yield return StartCoroutine(GenerateCorridor(root));
     }
 
-    void GenerateCorridor(Node node)
+    IEnumerator GenerateCorridor(Node node)
     {
-        //loop through nodes children and generates a corridor for each child
+        if (genSpeed < 1.0f)
+            yield return new WaitForSeconds(1.0f - genSpeed);
+
+        //loop through the nodes children and generates a corridor for each child
         foreach (Node child in node.children)
         {
             Vector3 difference = node.position - child.position;
             Vector3 midPoint = (node.position + child.position) / 2;
 
-            GameObject corridor = Instantiate(corridorFloor, midPoint, Quaternion.identity);
+            GameObject corridor = Instantiate(corridorFloor, midPoint, Quaternion.identity, transform);
 
             if (difference.z != 0)
                 corridor.transform.localScale = new Vector3(1, 1, Mathf.Abs(difference.z));
             else if (difference.x != 0)
                 corridor.transform.localScale = new Vector3(Mathf.Abs(difference.x), 1, 1);
 
-            GenerateCorridor(child);
+            yield return StartCoroutine(GenerateCorridor(child));
         }
     }
 
-    void GenerateRooms()
+    IEnumerator GenerateRooms()
     {
+        yield return StartCoroutine(GenerateRoom(root));
+    }
 
+    IEnumerator GenerateRoom(Node node)
+    {
+        if (genSpeed < 1.0f)
+            yield return new WaitForSeconds(1.0f - genSpeed);
+
+        //generate the room
+        if (node.isRoom)      
+            Instantiate(roomPrefab, node.position, Quaternion.identity, transform);
+
+        //loop through the children and invoke the funtcion
+        foreach (Node child in node.children)   
+            yield return StartCoroutine(GenerateRoom(child));
     }
 
     IEnumerator GenerateNodes()
