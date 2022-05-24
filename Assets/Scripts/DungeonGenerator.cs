@@ -10,7 +10,7 @@ public class DungeonGenerator : MonoBehaviour
     public int corridorLength = 10;
 
     [Tooltip("The Total Amount of Rooms That Will Be Generated")]
-    [Range(1, 100)]
+    [Range(1, 200)]
     public int roomCount = 5;
 
     [Tooltip("The chance of Generating A Room")]
@@ -22,11 +22,17 @@ public class DungeonGenerator : MonoBehaviour
 
     [Header("GameObjects")]
     public GameObject corridorFloor;
-    public GameObject roomPrefab;
+    public GameObject[] roomPreFabs;
 
     [Header("Debug")]
     [Range(0.0f, 1.0f)]
     public float genSpeed = 1.0f;
+    public bool waitForGizmosGen = false;
+
+    public Camera cam;
+    public Vector3 offset;
+
+    Vector3 targetPos = Vector3.zero;
 
     Dictionary<Vector3, Node> knownPositions = new Dictionary<Vector3, Node>();
     List<Node> deletedNodes = new List<Node>(); //testing which nodes got deleted
@@ -42,6 +48,11 @@ public class DungeonGenerator : MonoBehaviour
 
         StartCoroutine(GenerateDungeon());
 
+    }
+
+    private void Update()
+    {
+        cam.transform.position = Vector3.Lerp(cam.transform.position, targetPos + offset, Time.deltaTime * 3);
     }
 
     IEnumerator GenerateDungeon()
@@ -66,10 +77,13 @@ public class DungeonGenerator : MonoBehaviour
         //loop through the nodes children and generates a corridor for each child
         foreach (Node child in node.children)
         {
+
+            //todo: the difference needs to be the rooms edge
             Vector3 difference = node.position - child.position;
             Vector3 midPoint = (node.position + child.position) / 2;
 
             GameObject corridor = Instantiate(corridorFloor, midPoint, Quaternion.identity, transform);
+            targetPos = midPoint;
 
             if (difference.z != 0)
                 corridor.transform.localScale = new Vector3(1, 1, Mathf.Abs(difference.z));
@@ -90,12 +104,15 @@ public class DungeonGenerator : MonoBehaviour
         if (genSpeed < 1.0f)
             yield return new WaitForSeconds(1.0f - genSpeed);
 
-        //generate the room
-        if (node.isRoom)      
-            Instantiate(roomPrefab, node.position, Quaternion.identity, transform);
+        //generate the room if the list isnt empty
+        if (node.isRoom && roomPreFabs.Length != 0)
+        {
+            Instantiate(roomPreFabs[Random.Range(0, roomPreFabs.Length)], node.position, Quaternion.identity, transform);
+            targetPos = node.position;
 
+        }
         //loop through the children and invoke the funtcion
-        foreach (Node child in node.children)   
+        foreach (Node child in node.children)
             yield return StartCoroutine(GenerateRoom(child));
     }
 
@@ -112,7 +129,7 @@ public class DungeonGenerator : MonoBehaviour
         while (totalRooms < roomCount)
         {
             //if genSpeed isnt maxed be able to visualise it.
-            if (genSpeed < 1.0f)
+            if (genSpeed < 1.0f && waitForGizmosGen)
                 yield return new WaitForSeconds(1.0f - genSpeed);
 
             Vector3 randDir = Direction3D.GetRandomDirectionXZ();
@@ -133,8 +150,6 @@ public class DungeonGenerator : MonoBehaviour
             newNode.isRoom = Random.Range(0, 100) < roomChance || segmentCount >= maxCorridorSegments - 1;
             currentNode.children.Add(newNode);
             newNode.parent = currentNode;
-
-
 
             //add new position to known positions
             knownPositions.Add(newPos, newNode);
@@ -161,7 +176,6 @@ public class DungeonGenerator : MonoBehaviour
 
         foreach (Node leaf in leafNodes)
             RemoveDeadEnd(leaf);
-
 
     }
 

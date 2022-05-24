@@ -10,7 +10,6 @@ public class Node
 
     public Node parent = null;
 
-    //room data
     public bool isRoom = true;
 
     public Node(Vector3 position)
