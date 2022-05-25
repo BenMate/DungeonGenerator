@@ -619,9 +619,9 @@ MonoBehaviour:
   maxCorridorSegments: 3
   corridorFloor: {fileID: 1949073592566165718, guid: 13093b83171939548952a3ce21bd3c27, type: 3}
   roomPreFabs:
-  - {fileID: 2295085706261190550, guid: 9ee99d91bb1cd144aa544adfe211218b, type: 3}
-  - {fileID: 4252514699789122861, guid: fed24be564202d64fa297de0e6a7bed9, type: 3}
-  - {fileID: 9060575384798780263, guid: 145ac413086ef4c42baa950b9ebcfa7c, type: 3}
+  - {fileID: 8590681860216447595, guid: fed24be564202d64fa297de0e6a7bed9, type: 3}
+  - {fileID: 3466193657747572152, guid: 9ee99d91bb1cd144aa544adfe211218b, type: 3}
+  - {fileID: 1286726419145423494, guid: 145ac413086ef4c42baa950b9ebcfa7c, type: 3}
   genSpeed: 0.99
   waitForGizmosGen: 1
   cam: {fileID: 963194227}
@@ -859,8 +859,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7371c9f0270e6214283a0788e18f1d82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offset: {x: 0, y: 0, z: 0}
-  size: {x: 3, y: 2.08, z: 2}
+  boundOffset: {x: 0, y: 0, z: 0}
+  bounds: {x: 1, y: 1, z: 1}
 --- !u!4 &1846290874
 Transform:
   m_ObjectHideFlags: 0

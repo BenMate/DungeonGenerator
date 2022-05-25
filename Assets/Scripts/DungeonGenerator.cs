@@ -4,7 +4,11 @@ using UnityEngine;
 
 public class DungeonGenerator : MonoBehaviour
 {
-    [Header("Debug")]
+    [Header("Config")]
+
+    [Tooltip("Clamp the min size to be the rooms max length")]
+    public bool forceCorriderMin = false;
+
     [Tooltip("The Total Length of the corridors")]
     [Range(5.0f, 100.0f)]
     public int corridorLength = 10;
@@ -22,7 +26,8 @@ public class DungeonGenerator : MonoBehaviour
 
     [Header("GameObjects")]
     public GameObject corridorFloor;
-    public GameObject[] roomPreFabs;
+
+    public Room[] roomPreFabs;
 
     [Header("Debug")]
     [Range(0.0f, 1.0f)]
@@ -35,6 +40,8 @@ public class DungeonGenerator : MonoBehaviour
     Vector3 targetPos = Vector3.zero;
 
     Dictionary<Vector3, Node> knownPositions = new Dictionary<Vector3, Node>();
+    Dictionary<Node, Room> nodeBoundsPair = new Dictionary<Node, Room>();
+
     List<Node> deletedNodes = new List<Node>(); //testing which nodes got deleted
 
     Node root;
@@ -45,7 +52,6 @@ public class DungeonGenerator : MonoBehaviour
 
     void Start()
     {
-
         StartCoroutine(GenerateDungeon());
 
     }
@@ -55,13 +61,36 @@ public class DungeonGenerator : MonoBehaviour
         cam.transform.position = Vector3.Lerp(cam.transform.position, targetPos + offset, Time.deltaTime * 3);
     }
 
-    IEnumerator GenerateDungeon()
+    public IEnumerator GenerateDungeon()
     {
+        //if children already exist remove them
+        DestroyAllChildren();
+        CalculateCorridorLength();
         yield return StartCoroutine(GenerateNodes());
         yield return StartCoroutine(GenerateRooms());
         yield return StartCoroutine(GenerateCorridors());
 
         print($"Total Generated Rooms : {totalRooms} \nTotal Generated Corridors : {nodeCount}");
+    }
+
+    private void CalculateCorridorLength()
+    {
+        //set min corridor length
+        if (forceCorriderMin)
+        {
+            //loop through each prefab set corrdorlength to be the highest x or z
+            int maxLength = 0;
+            for (int i = 0; i < roomPreFabs.Length; i++)
+            {
+                Vector3 scale = roomPreFabs[i].gameObject.transform.localScale;
+
+                if (scale.z > scale.x)
+                    maxLength = (int)(scale.z > maxLength ? scale.z + 0.5f : maxLength);
+                else
+                    maxLength = (int)(scale.x > maxLength ? scale.x + 0.5f : maxLength);
+            }
+            corridorLength = maxLength;
+        }
     }
 
     IEnumerator GenerateCorridors()
@@ -71,6 +100,7 @@ public class DungeonGenerator : MonoBehaviour
 
     IEnumerator GenerateCorridor(Node node)
     {
+        //set the gen speed
         if (genSpeed < 1.0f)
             yield return new WaitForSeconds(1.0f - genSpeed);
 
@@ -78,9 +108,22 @@ public class DungeonGenerator : MonoBehaviour
         foreach (Node child in node.children)
         {
 
-            //todo: the difference needs to be the rooms edge
-            Vector3 difference = node.position - child.position;
-            Vector3 midPoint = (node.position + child.position) / 2;
+            //get the direction the parrent is to the child
+            Vector3 dir = child.position - node.position;
+            dir.Normalize();
+
+            //set the node offset and size
+            Vector3 nodePosOffset = node.position + (node.isRoom ? nodeBoundsPair[node].offset : Vector3.zero);
+            Vector3 nodePosSize = node.isRoom ? nodeBoundsPair[node].size : Vector3.zero;
+            nodePosOffset += Vector3.Scale(dir, nodePosSize) / 2;
+
+            //set the childs size and offset
+            Vector3 childPosOffset = child.position + (child.isRoom ? nodeBoundsPair[child].offset : Vector3.zero);
+            Vector3 childPosSize = child.isRoom ? nodeBoundsPair[child].size : Vector3.zero;
+            childPosOffset += Vector3.Scale(-dir, childPosSize) / 2;
+
+            Vector3 difference = nodePosOffset - childPosOffset;
+            Vector3 midPoint = (nodePosOffset + childPosOffset) / 2;
 
             GameObject corridor = Instantiate(corridorFloor, midPoint, Quaternion.identity, transform);
             targetPos = midPoint;
@@ -107,9 +150,11 @@ public class DungeonGenerator : MonoBehaviour
         //generate the room if the list isnt empty
         if (node.isRoom && roomPreFabs.Length != 0)
         {
-            Instantiate(roomPreFabs[Random.Range(0, roomPreFabs.Length)], node.position, Quaternion.identity, transform);
-            targetPos = node.position;
+            Room roomPrefab = Instantiate(roomPreFabs[Random.Range(0, roomPreFabs.Length)], node.position, Quaternion.identity, transform);
 
+            nodeBoundsPair.Add(node, roomPrefab);
+
+            targetPos = node.position;
         }
         //loop through the children and invoke the funtcion
         foreach (Node child in node.children)
@@ -177,6 +222,18 @@ public class DungeonGenerator : MonoBehaviour
         foreach (Node leaf in leafNodes)
             RemoveDeadEnd(leaf);
 
+    }
+
+    void DestroyAllChildren()
+    {
+        //loop trough the nodes and delete all children
+        while (transform.childCount != 0)
+        {
+            foreach (Transform item in transform)
+            {
+                DestroyImmediate(item.gameObject);
+            }
+        }
     }
 
     void RemoveDeadEnd(Node node)
