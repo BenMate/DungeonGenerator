@@ -6,7 +6,7 @@ public class DungeonGenerator : MonoBehaviour
 {
     [Header("Config")]
 
-    [Tooltip("Clamp the min size to be the rooms max length")]
+    [Tooltip("Clamps CorridorLength to rooms size, helps prevent rooms from touching")]
     public bool forceCorriderMin = false;
 
     [Tooltip("The Total Length of the corridors")]
@@ -17,7 +17,7 @@ public class DungeonGenerator : MonoBehaviour
     [Range(1, 200)]
     public int roomCount = 5;
 
-    [Tooltip("The chance of Generating A Room")]
+    [Tooltip("The chances of Generating A Room")]
     [Range(0, 100)]
     public int roomChance = 50;
 
@@ -27,6 +27,7 @@ public class DungeonGenerator : MonoBehaviour
     [Header("GameObjects")]
     public GameObject corridorFloor;
 
+    [Tooltip("Put Prefabs in this list that have 'room' scrips attached")]
     public Room[] roomPreFabs;
 
     [Header("Debug")]
@@ -43,6 +44,8 @@ public class DungeonGenerator : MonoBehaviour
     Dictionary<Node, Room> nodeBoundsPair = new Dictionary<Node, Room>();
 
     List<Node> deletedNodes = new List<Node>(); //testing which nodes got deleted
+
+    List<Room> doors = new List<Room>(); //a list of doors
 
     Node root;
     Node currentNode;
@@ -63,12 +66,15 @@ public class DungeonGenerator : MonoBehaviour
 
     public IEnumerator GenerateDungeon()
     {
-        //if children already exist remove them
+
         DestroyAllChildren();
+
         CalculateCorridorLength();
+
         yield return StartCoroutine(GenerateNodes());
         yield return StartCoroutine(GenerateRooms());
         yield return StartCoroutine(GenerateCorridors());
+        yield return StartCoroutine(ToggleRoomDoors());
 
         print($"Total Generated Rooms : {totalRooms} \nTotal Generated Corridors : {nodeCount}");
     }
@@ -91,6 +97,29 @@ public class DungeonGenerator : MonoBehaviour
             }
             corridorLength = maxLength;
         }
+    }
+
+    IEnumerator ToggleRoomDoors()
+    {
+        yield return StartCoroutine(ToggleRoomDoor());
+    }
+
+    IEnumerator ToggleRoomDoor()
+    {
+        //set the gen speed
+        if (genSpeed < 1.0f)
+            yield return new WaitForSeconds(1.0f - genSpeed);
+
+        //todo: gain the knowledge to disable 2 of the 4 doors in the list
+
+        //get a list of all doors
+
+        //check if the door should be disabled
+
+        // -check if door is near corridor???
+        // -check on the xor z axis to tell the room what door should be disabled
+        // -check on the 
+
     }
 
     IEnumerator GenerateCorridors()
@@ -260,6 +289,8 @@ public class DungeonGenerator : MonoBehaviour
 
         return leafNodes;
     }
+
+    //debug functions
 
     void OnDrawGizmos()
     {
