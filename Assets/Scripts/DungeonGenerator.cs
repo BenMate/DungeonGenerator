@@ -142,13 +142,13 @@ public class DungeonGenerator : MonoBehaviour
             dir.Normalize();
 
             //set the node offset and size
-            Vector3 nodePosOffset = node.position + (node.isRoom ? nodeBoundsPair[node].offset : Vector3.zero);
-            Vector3 nodePosSize = node.isRoom ? nodeBoundsPair[node].size : Vector3.zero;
+            Vector3 nodePosOffset = node.position + (node.isRoom ? nodeBoundsPair[node].boundsOffset : Vector3.zero);
+            Vector3 nodePosSize = node.isRoom ? nodeBoundsPair[node].boundsSize : Vector3.zero;
             nodePosOffset += Vector3.Scale(dir, nodePosSize) / 2;
 
             //set the childs size and offset
-            Vector3 childPosOffset = child.position + (child.isRoom ? nodeBoundsPair[child].offset : Vector3.zero);
-            Vector3 childPosSize = child.isRoom ? nodeBoundsPair[child].size : Vector3.zero;
+            Vector3 childPosOffset = child.position + (child.isRoom ? nodeBoundsPair[child].boundsOffset : Vector3.zero);
+            Vector3 childPosSize = child.isRoom ? nodeBoundsPair[child].boundsSize : Vector3.zero;
             childPosOffset += Vector3.Scale(-dir, childPosSize) / 2;
 
             Vector3 difference = nodePosOffset - childPosOffset;

@@ -1353,10 +1353,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7371c9f0270e6214283a0788e18f1d82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offset: {x: 0, y: 0, z: 0}
-  size: {x: 20, y: 2, z: 20}
+  boundsOffset: {x: 0, y: 3.05, z: 0}
+  boundsSize: {x: 20, y: 4, z: 20}
   doorList:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  enemyLocations:
+  - {x: 5.45, y: 2, z: -5.64}
+  - {x: -6.95, y: 2, z: -5.64}
+  - {x: -6.95, y: 2, z: 7.38}
+  itemLocations:
+  - {x: 5.43, y: 2, z: 7.22}
