@@ -623,9 +623,7 @@ MonoBehaviour:
   - {fileID: 3280313639123120088, guid: 9c8821d7cd9c4de4aa5cc905e303fa9e, type: 3}
   - {fileID: 3466193657747572152, guid: 9ee99d91bb1cd144aa544adfe211218b, type: 3}
   - {fileID: 1286726419145423494, guid: 145ac413086ef4c42baa950b9ebcfa7c, type: 3}
-  enemyPrefabs:
-  - {fileID: 1473252700295154238, guid: 08ac894dc6b736848b4b443813909d89, type: 3}
-  genSpeed: 0.809
+  genSpeed: 1
   waitForGizmosGen: 0
   cam: {fileID: 963194227}
   offset: {x: 0, y: 500, z: -500}
@@ -865,7 +863,9 @@ MonoBehaviour:
   boundsOffset: {x: 0, y: 0, z: 0}
   boundsSize: {x: 1, y: 1, z: 1}
   doorList: []
-  enemyLocations: []
+  enemyPrefabs: []
+  possibleEnemySpawns: []
+  enemySpawncount: 1
   itemLocations: []
 --- !u!4 &1846290874
 Transform:

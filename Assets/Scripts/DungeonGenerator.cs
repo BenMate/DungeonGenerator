@@ -75,7 +75,7 @@ public class DungeonGenerator : MonoBehaviour
         yield return StartCoroutine(GenerateRooms());
         yield return StartCoroutine(GenerateCorridors());
         yield return StartCoroutine(ToggleRoomDoors());
-        yield return StartCoroutine(GenerateEnemies());
+        //yield return StartCoroutine(GenerateEnemies());
 
         print($"Total Generated Rooms : {totalRooms} \nTotal Generated Corridors : {nodeCount}");
     }
@@ -144,16 +144,21 @@ public class DungeonGenerator : MonoBehaviour
             //set the node offset and size
             Vector3 nodePosOffset = node.position + (node.isRoom ? nodeRoomPair[node].boundsOffset : Vector3.zero);
             Vector3 nodePosSize = node.isRoom ? nodeRoomPair[node].boundsSize : Vector3.zero;
-            nodePosOffset += Vector3.Scale(dir, nodePosSize) / 2;
 
             //set the childs size and offset
             Vector3 childPosOffset = child.position + (child.isRoom ? nodeRoomPair[child].boundsOffset : Vector3.zero);
             Vector3 childPosSize = child.isRoom ? nodeRoomPair[child].boundsSize : Vector3.zero;
+
+            //make the offset y = 0 to keep on the same level
+            Vector3 nodeXZOffset = new Vector3(nodePosOffset.x, 0, nodePosOffset.z);
+            nodeXZOffset += Vector3.Scale(dir, nodePosSize) / 2;
+
             childPosOffset += Vector3.Scale(-dir, childPosSize) / 2;
+            Vector3 childXZOffSet = new Vector3(childPosOffset.x, 0, childPosOffset.z);
 
             //calculate where the offsets are and midpoint
-            Vector3 difference = nodePosOffset - childPosOffset;
-            Vector3 midPoint = (nodePosOffset + childPosOffset) / 2;
+            Vector3 difference = nodeXZOffset - childXZOffSet;
+            Vector3 midPoint = (nodeXZOffset + childXZOffSet) / 2;
 
             GameObject corridor = Instantiate(corridorFloor, midPoint, Quaternion.identity, transform);
             targetPos = midPoint;

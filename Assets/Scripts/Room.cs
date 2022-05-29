@@ -49,6 +49,7 @@ public class Room : MonoBehaviour
     void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
+        
         Gizmos.DrawWireCube(transform.position + boundsOffset, boundsSize);
 
         //every spawn locations
@@ -66,7 +67,7 @@ public class Room : MonoBehaviour
             Vector3 itemPos = new Vector3(itemLocations[i].x, itemLocations[i].y, itemLocations[i].z);
             Gizmos.DrawWireCube(itemPos, Vector3.one);
         }
-       
+
     }
 
 
