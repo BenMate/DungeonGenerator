@@ -27,7 +27,7 @@ public class DungeonGenerator : MonoBehaviour
     [Header("GameObjects")]
     public GameObject corridorFloor;
 
-    [Tooltip("Put Prefabs in this list that have 'room' scrips attached")]
+    [Tooltip("Put room Prefabs in this list that have 'room' scrips attached")]
     public Room[] roomPreFabs;
 
     [Header("Debug")]
@@ -41,7 +41,7 @@ public class DungeonGenerator : MonoBehaviour
     Vector3 targetPos = Vector3.zero;
 
     Dictionary<Vector3, Node> knownPositions = new Dictionary<Vector3, Node>();
-    Dictionary<Node, Room> nodeBoundsPair = new Dictionary<Node, Room>();
+    Dictionary<Node, Room> nodeRoomPair = new Dictionary<Node, Room>();
 
     List<Node> deletedNodes = new List<Node>(); //testing which nodes got deleted
 
@@ -75,6 +75,7 @@ public class DungeonGenerator : MonoBehaviour
         yield return StartCoroutine(GenerateRooms());
         yield return StartCoroutine(GenerateCorridors());
         yield return StartCoroutine(ToggleRoomDoors());
+        yield return StartCoroutine(GenerateEnemies());
 
         print($"Total Generated Rooms : {totalRooms} \nTotal Generated Corridors : {nodeCount}");
     }
@@ -136,21 +137,21 @@ public class DungeonGenerator : MonoBehaviour
         //loop through the nodes children and generates a corridor for each child
         foreach (Node child in node.children)
         {
-
             //get the direction the parrent is to the child
             Vector3 dir = child.position - node.position;
             dir.Normalize();
 
             //set the node offset and size
-            Vector3 nodePosOffset = node.position + (node.isRoom ? nodeBoundsPair[node].boundsOffset : Vector3.zero);
-            Vector3 nodePosSize = node.isRoom ? nodeBoundsPair[node].boundsSize : Vector3.zero;
+            Vector3 nodePosOffset = node.position + (node.isRoom ? nodeRoomPair[node].boundsOffset : Vector3.zero);
+            Vector3 nodePosSize = node.isRoom ? nodeRoomPair[node].boundsSize : Vector3.zero;
             nodePosOffset += Vector3.Scale(dir, nodePosSize) / 2;
 
             //set the childs size and offset
-            Vector3 childPosOffset = child.position + (child.isRoom ? nodeBoundsPair[child].boundsOffset : Vector3.zero);
-            Vector3 childPosSize = child.isRoom ? nodeBoundsPair[child].boundsSize : Vector3.zero;
+            Vector3 childPosOffset = child.position + (child.isRoom ? nodeRoomPair[child].boundsOffset : Vector3.zero);
+            Vector3 childPosSize = child.isRoom ? nodeRoomPair[child].boundsSize : Vector3.zero;
             childPosOffset += Vector3.Scale(-dir, childPosSize) / 2;
 
+            //calculate where the offsets are and midpoint
             Vector3 difference = nodePosOffset - childPosOffset;
             Vector3 midPoint = (nodePosOffset + childPosOffset) / 2;
 
@@ -181,10 +182,12 @@ public class DungeonGenerator : MonoBehaviour
         {
             Room roomPrefab = Instantiate(roomPreFabs[Random.Range(0, roomPreFabs.Length)], node.position, Quaternion.identity, transform);
 
-            nodeBoundsPair.Add(node, roomPrefab);
+            //pair everynode with a room.
+            nodeRoomPair.Add(node, roomPrefab);
 
             targetPos = node.position;
         }
+
         //loop through the children and invoke the funtcion
         foreach (Node child in node.children)
             yield return StartCoroutine(GenerateRoom(child));
@@ -217,8 +220,7 @@ public class DungeonGenerator : MonoBehaviour
                 continue;
             }
 
-            //generate a new node with:
-            //a new position a parent and an ability to have a room.
+            //generate a new position a parent and an ability to have a room.
             Node newNode = new Node(newPos);
             nodeCount++;
             newNode.isRoom = Random.Range(0, 100) < roomChance || segmentCount >= maxCorridorSegments - 1;
@@ -236,8 +238,6 @@ public class DungeonGenerator : MonoBehaviour
             {
                 totalRooms++;
                 segmentCount = 0;
-
-                //generate room prefab
             }
             else
             {
@@ -290,8 +290,49 @@ public class DungeonGenerator : MonoBehaviour
         return leafNodes;
     }
 
-    //debug functions
+    IEnumerator GenerateEnemies()
+    {
+        yield return StartCoroutine(GenerateEnemy());
+    }
 
+    IEnumerator GenerateEnemy()
+    {
+        if (genSpeed < 1.0f)
+            yield return new WaitForSeconds(1.0f - genSpeed);
+
+        ////for every room, spawn an enemy at its given location
+        //for (int i = 0; i < roomPreFabs.Length; i++)
+        //{
+        //if there are no prefabs or spawns continue;
+
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (roomPreFabs[i].enemyPrefabs.Count < 1 || roomPreFabs[i].possibleEnemySpawns.Count < 1)
+                continue;
+
+            Vector3 randomPos = roomPreFabs[i].possibleEnemySpawns
+                    [Random.Range(0, roomPreFabs[i].possibleEnemySpawns.Count)];
+
+            Room randomEnemyPrefab = roomPreFabs[Random.Range(0, roomPreFabs[i].enemyPrefabs.Count)];
+
+            GameObject enemyPrefab = Instantiate(randomEnemyPrefab.gameObject, randomPos, Quaternion.identity);
+
+        }
+
+
+
+
+
+
+
+
+        //]
+
+
+    }
+
+    //debug functions
     void OnDrawGizmos()
     {
         if (root != null)

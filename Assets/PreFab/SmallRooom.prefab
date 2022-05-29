@@ -1360,9 +1360,9 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  enemyLocations:
-  - {x: 5.45, y: 2, z: -5.64}
-  - {x: -6.95, y: 2, z: -5.64}
-  - {x: -6.95, y: 2, z: 7.38}
+  enemyPrefabs:
+  - {fileID: 1989597467958878145, guid: 497262a044b133d4a87d169f9c34de93, type: 3}
+  possibleEnemySpawns:
+  - {x: 2.46, y: 2.32, z: 1.21}
   itemLocations:
   - {x: 5.43, y: 2, z: 7.22}
