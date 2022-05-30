@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 9060575384798780263}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 157.72241, y: 6.8962307, z: 90.80175}
+  m_LocalScale: {x: 157.72241, y: -0.7213457, z: 90.80175}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -61,7 +61,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 64e2fd2a80095a646a4edafb8f641d89, type: 2}
+  - {fileID: 2100000, guid: 09b8333152099934c80c48e5c983e26f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -109,9 +109,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boundsOffset: {x: 0, y: 0, z: 0}
-  boundsSize: {x: 163.02, y: 1, z: 89.6}
-  doorList: []
-  enemyPrefabs: []
-  possibleEnemySpawns: []
-  enemySpawncount: 1
+  boundsSize: {x: 157.72241, y: 0.7213457, z: 90.80175}
+  possibleEnemySpawns:
+  - {x: 0, y: 5.81, z: 0}
+  maxEnemyCount: 1
+  minEnemyCount: 1
   itemLocations: []

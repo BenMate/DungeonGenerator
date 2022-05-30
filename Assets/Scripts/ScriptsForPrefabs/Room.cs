@@ -9,50 +9,73 @@ public class Room : MonoBehaviour
     public Vector3 boundsOffset = Vector3.zero;
     public Vector3 boundsSize = Vector3.one;
 
-    [Header("Doors Config")]
-    [Tooltip("Four doors are requiered, they are toggled off when needed to")]
-    public List<GameObject> doorList = new List<GameObject>(4);
-
     [Header("Enemys Config - Red")]
     [Tooltip("Create a list of possible enemy spawns")]
     public List<Vector3> possibleEnemySpawns = new List<Vector3>();
 
     [Tooltip("Max number of enemies per room that can spawn")]
-    public int maxEnemyCount = 1;
+    public int maxEnemyCount = 3;
+
+    [Tooltip("Min number of enemies per room that can spawn")]
+    public int minEnemyCount = 0;
 
     [Header("Item Config - Cyan")]
     [Tooltip("List of item Spawn Locations")]
     public List<Vector3> itemLocations = new List<Vector3>();
 
-    public void SpawnEnemyPrefabs(EnemyType[] enemies)
+    List<Vector3> posList = new List<Vector3>();
+
+    public void SpawnEnemyPrefabs(EnemyType[] enemies, Transform parent = null)
     {
-        //temp list
-        List<Vector3> tempList = possibleEnemySpawns;
+        posList = possibleEnemySpawns;
 
-        for (int i = 0; i < maxEnemyCount; i++)
+        for (int i = 0; i < Random.Range(minEnemyCount, maxEnemyCount); i++)
         {
-            EnemyType randEnemy = enemies[Random.Range(0, enemies.Length)];
-            //random pos
-            Vector3 randPos = tempList[Random.Range(0, tempList.Count)];
-            //instantiante
+            if (posList.Count == 0 || enemies.Length == 0)
+                break;
 
-            //remove item from list...
+            //spawn random enemy on a random position, shrink list
+            int randIndex = Random.Range(0, posList.Count);
+            EnemyType randEnemy = enemies[Random.Range(0, enemies.Length)];
+            Vector3 randPos = posList[randIndex];
+
+            posList.RemoveAt(randIndex);
+
+            EnemyType enemyPrefab = Instantiate(randEnemy, parent);
+            enemyPrefab.transform.position = randPos + transform.position;
+
         }
     }
 
-    void RestrictDoorCount()
+    public void CalculateBounds()
     {
-        if (doorList.Count > 4)
-            Debug.LogError("cannot have more then 4 doors in the list, trimmed down to 4.");
+        Bounds bounds = Encap(transform, new Bounds());
+        boundsOffset = bounds.center;
+        boundsSize = bounds.size;
+    }
 
-        //trim the list down to 4
-        for (int i = 0; i < doorList.Count; i++)
+    Bounds Encap(Transform parent, Bounds blocker)
+    {
+        if (parent.childCount == 0)
         {
-            if (i > 4)
-            {
-                doorList.RemoveAt(i);
-            }
+            Renderer rend = parent.GetComponent<Renderer>();
+
+            if (rend != null)
+                blocker.Encapsulate(rend.bounds);
+
+            return blocker;
         }
+
+        foreach (Transform child in parent)
+        {
+            Renderer renderer = child.GetComponent<Renderer>();
+            
+            if (renderer != null)
+                blocker.Encapsulate(renderer.bounds);
+
+            blocker = Encap(child, blocker);
+        }
+        return blocker;
     }
 
     void OnDrawGizmos()

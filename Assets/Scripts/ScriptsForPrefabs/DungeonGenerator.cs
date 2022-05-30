@@ -40,17 +40,26 @@ public class DungeonGenerator : MonoBehaviour
 
     //node data
     List<Node> deletedNodes = new List<Node>();
+
     Dictionary<Vector3, Node> knownPositions = new Dictionary<Vector3, Node>();
     Dictionary<Node, Room> nodeRoomPair = new Dictionary<Node, Room>();
+
     Node root;
     Node currentNode;
+
     int totalRooms = 1;
     int nodeCount = 0;
 
     PrefabDatabase database = new PrefabDatabase();
 
+    GameObject roomContainer;
+    GameObject enemyContainer;
+
     void Start()
     {
+        roomContainer = new GameObject("Dungeon Rooms");
+        enemyContainer = new GameObject("Dungeon Enemies");
+
         database.LoadPrefabs();
         StartCoroutine(GenerateDungeon());
     }
@@ -60,17 +69,10 @@ public class DungeonGenerator : MonoBehaviour
         cam.transform.position = Vector3.Lerp(cam.transform.position, targetPos + offset, Time.deltaTime * 3);
     }
 
-    void LoadPreFabDataBase()
-    {
-        database.LoadPrefabs();
-
-    }
-
     public IEnumerator GenerateDungeon()
     {
-
-        DestroyAllChildren(); // deletes dungeon if one laready exists
-        LoadPreFabDataBase();
+        // deletes dungeon if one laready exists
+        DestroyAllChildren();
         CalculateCorridorLength();
 
         yield return StartCoroutine(GenerateNodes());
@@ -145,6 +147,19 @@ public class DungeonGenerator : MonoBehaviour
             else if (difference.x != 0)
                 corridor.transform.localScale = new Vector3(Mathf.Abs(difference.x), 1, 1);
 
+            //if node .isroom = true TODO
+            GameObject nodeDoor = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            GameObject childDoor = GameObject.CreatePrimitive(PrimitiveType.Cube);
+
+        
+            nodeDoor.transform.position = nodeXZOffset;
+            nodeDoor.transform.localScale = Vector3.one * 4;
+
+            childDoor.transform.position = childXZOffSet;
+            childDoor.transform.localScale = Vector3.one * 4;
+
+
+
             yield return StartCoroutine(GenerateCorridor(child));
         }
     }
@@ -159,19 +174,20 @@ public class DungeonGenerator : MonoBehaviour
         if (genSpeed < 1.0f)
             yield return new WaitForSeconds(1.0f - genSpeed);
 
+
+
         //generate the room if the array isnt empty
         if (node.isRoom && database.allRooms.Length != 0)
         {
-            Room roomPrefab = Instantiate(database.allRooms[Random.Range(0, database.allRooms.Length)], node.position, Quaternion.identity, transform);
+            Room roomPrefab = Instantiate(database.allRooms[Random.Range(0, database.allRooms.Length)], node.position, Quaternion.identity, roomContainer.transform);
 
             //pair every node with a room.
             nodeRoomPair.Add(node, roomPrefab);
             targetPos = node.position;
 
-            roomPrefab.SpawnEnemyPrefabs(database.allEnemies);
+            roomPrefab.SpawnEnemyPrefabs(database.allEnemies, enemyContainer.transform);
 
-
-        } 
+        }
         //loop through the children and invoke the funtcion
         foreach (Node child in node.children)
             yield return StartCoroutine(GenerateRoom(child));
