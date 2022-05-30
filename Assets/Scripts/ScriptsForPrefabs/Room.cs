@@ -9,6 +9,7 @@ public class Room : MonoBehaviour
     public Vector3 boundsOffset = Vector3.zero;
     public Vector3 boundsSize = Vector3.one;
 
+
     [Header("Enemys Config - Red")]
     [Tooltip("Create a list of possible enemy spawns")]
     public List<Vector3> possibleEnemySpawns = new List<Vector3>();
