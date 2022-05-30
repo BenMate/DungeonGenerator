@@ -27,9 +27,6 @@ public class DungeonGenerator : MonoBehaviour
     [Header("GameObjects")]
     public GameObject corridorFloor;
 
-    [Tooltip("Put room Prefabs in this list that have 'room' scrips attached")]
-    public Room[] roomPreFabs;
-
     [Header("Debug")]
     [Range(0.0f, 1.0f)]
     public float genSpeed = 1.0f;
@@ -44,8 +41,12 @@ public class DungeonGenerator : MonoBehaviour
     Dictionary<Node, Room> nodeRoomPair = new Dictionary<Node, Room>();
 
     List<Node> deletedNodes = new List<Node>(); //testing which nodes got deleted
+    List<Room> doors = new List<Room>();
 
-    List<Room> doors = new List<Room>(); //a list of doors
+    PrefabDatabase database = new PrefabDatabase();
+    Room[] roomPreFabs = new Room[0];
+    EnemyType[] enemyPrefabs = new EnemyType[0];
+   
 
     Node root;
     Node currentNode;
@@ -56,7 +57,6 @@ public class DungeonGenerator : MonoBehaviour
     void Start()
     {
         StartCoroutine(GenerateDungeon());
-
     }
 
     private void Update()
@@ -64,17 +64,32 @@ public class DungeonGenerator : MonoBehaviour
         cam.transform.position = Vector3.Lerp(cam.transform.position, targetPos + offset, Time.deltaTime * 3);
     }
 
+    void LoadPreFabDataBase()
+    {
+        database.LoadPrefabs();
+
+        //room prefabs
+        roomPreFabs = new Room[database.allRooms.Length];
+        for (int i = 0; i < database.allRooms.Length; i++)    
+            roomPreFabs[i] = database.allRooms[i];
+
+        //enemy prefabs
+        enemyPrefabs = new EnemyType[database.allEnemies.Length];
+        for (int i = 0; i < database.allEnemies.Length; i++)      
+            enemyPrefabs[i] = database.allEnemies[i];
+        
+    }
+
     public IEnumerator GenerateDungeon()
     {
 
-        DestroyAllChildren();
-
+        DestroyAllChildren(); // deletes dungeon if one laready exists
+        LoadPreFabDataBase();
         CalculateCorridorLength();
 
         yield return StartCoroutine(GenerateNodes());
         yield return StartCoroutine(GenerateRooms());
         yield return StartCoroutine(GenerateCorridors());
-        yield return StartCoroutine(ToggleRoomDoors());
         //yield return StartCoroutine(GenerateEnemies());
 
         print($"Total Generated Rooms : {totalRooms} \nTotal Generated Corridors : {nodeCount}");
@@ -100,28 +115,8 @@ public class DungeonGenerator : MonoBehaviour
         }
     }
 
-    IEnumerator ToggleRoomDoors()
-    {
-        yield return StartCoroutine(ToggleRoomDoor());
-    }
 
-    IEnumerator ToggleRoomDoor()
-    {
-        //set the gen speed
-        if (genSpeed < 1.0f)
-            yield return new WaitForSeconds(1.0f - genSpeed);
 
-        //todo: gain the knowledge to disable 2 of the 4 doors in the list
-
-        //get a list of all doors
-
-        //check if the door should be disabled
-
-        // -check if door is near corridor???
-        // -check on the xor z axis to tell the room what door should be disabled
-        // -check on the 
-
-    }
 
     IEnumerator GenerateCorridors()
     {
@@ -182,15 +177,30 @@ public class DungeonGenerator : MonoBehaviour
         if (genSpeed < 1.0f)
             yield return new WaitForSeconds(1.0f - genSpeed);
 
-        //generate the room if the list isnt empty
+        //generate the room if the array isnt empty
         if (node.isRoom && roomPreFabs.Length != 0)
         {
             Room roomPrefab = Instantiate(roomPreFabs[Random.Range(0, roomPreFabs.Length)], node.position, Quaternion.identity, transform);
 
-            //pair everynode with a room.
+            //pair every node with a room.
             nodeRoomPair.Add(node, roomPrefab);
-
             targetPos = node.position;
+
+            ////generate a random enemy in a random possble spawn.
+            //if (enemyPrefabs.Length > 0)
+            //{
+            //    //generate an enemy up to max times or until it fills the possible enemy spawns
+            //    for (int i = 0; i < roomPrefab.maxEnemyCount; i++)
+            //    {
+            //        EnemyType randEnemy = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
+
+            //        Vector3 randPos = roomPrefab.possibleEnemySpawns[Random.Range(0, roomPrefab.possibleEnemySpawns.Count)];
+ 
+            //        EnemyType enemyPrefab = Instantiate(randEnemy, randPos, Quaternion.identity, transform);
+            //    }
+                
+            //}
+
         }
 
         //loop through the children and invoke the funtcion
@@ -293,48 +303,6 @@ public class DungeonGenerator : MonoBehaviour
             leafNodes.AddRange(GetLeafNodes(child));
 
         return leafNodes;
-    }
-
-    IEnumerator GenerateEnemies()
-    {
-        yield return StartCoroutine(GenerateEnemy());
-    }
-
-    IEnumerator GenerateEnemy()
-    {
-        if (genSpeed < 1.0f)
-            yield return new WaitForSeconds(1.0f - genSpeed);
-
-        ////for every room, spawn an enemy at its given location
-        //for (int i = 0; i < roomPreFabs.Length; i++)
-        //{
-        //if there are no prefabs or spawns continue;
-
-
-        for (int i = 0; i < 3; i++)
-        {
-            if (roomPreFabs[i].enemyPrefabs.Count < 1 || roomPreFabs[i].possibleEnemySpawns.Count < 1)
-                continue;
-
-            Vector3 randomPos = roomPreFabs[i].possibleEnemySpawns
-                    [Random.Range(0, roomPreFabs[i].possibleEnemySpawns.Count)];
-
-            Room randomEnemyPrefab = roomPreFabs[Random.Range(0, roomPreFabs[i].enemyPrefabs.Count)];
-
-            GameObject enemyPrefab = Instantiate(randomEnemyPrefab.gameObject, randomPos, Quaternion.identity);
-
-        }
-
-
-
-
-
-
-
-
-        //]
-
-
     }
 
     //debug functions

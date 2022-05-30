@@ -15,12 +15,11 @@ public class Room : MonoBehaviour
     public List<GameObject> doorList = new List<GameObject>(4);
 
     [Header("Enemys Config - Red")]
-    [Tooltip("List of enemy Spawn Locations")] 
-    public List<GameObject> enemyPrefabs = new List<GameObject>();
     [Tooltip("Create a list of possible enemy spawns")]
     public List<Vector3> possibleEnemySpawns = new List<Vector3>();
+
     [Tooltip("Max number of enemies per room that can spawn")]
-    public int enemySpawncount = 1;
+    public int maxEnemyCount = 1;
 
     [Header("Item Config - Cyan")]
     [Tooltip("List of item Spawn Locations")]
@@ -52,12 +51,13 @@ public class Room : MonoBehaviour
         
         Gizmos.DrawWireCube(transform.position + boundsOffset, boundsSize);
 
-        //every spawn locations
+        //every spawn locations draw a cube at the 
         for (int i = 0; i < possibleEnemySpawns.Count; i++)
         {
             Gizmos.color = Color.red;
             Vector3 enemyPos = new Vector3(possibleEnemySpawns[i].x, possibleEnemySpawns[i].y, possibleEnemySpawns[i].z);
-            Gizmos.DrawWireCube(enemyPos, Vector3.one);
+            
+            Gizmos.DrawWireCube(transform.position + enemyPos, Vector3.one);
         }
 
         //every item locations
@@ -65,7 +65,7 @@ public class Room : MonoBehaviour
         {
             Gizmos.color = Color.cyan;
             Vector3 itemPos = new Vector3(itemLocations[i].x, itemLocations[i].y, itemLocations[i].z);
-            Gizmos.DrawWireCube(itemPos, Vector3.one);
+            Gizmos.DrawWireCube(transform.position + itemPos, Vector3.one);
         }
 
     }
