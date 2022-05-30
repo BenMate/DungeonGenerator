@@ -1363,6 +1363,7 @@ MonoBehaviour:
   possibleEnemySpawns:
   - {x: 2.46, y: 2.32, z: 1.21}
   - {x: -0.09, y: 7.81, z: -3.14}
+  - {x: -0.09, y: 1.56, z: -3.14}
   maxEnemyCount: 1
   itemLocations:
   - {x: 5.43, y: 2, z: 7.22}

@@ -32,30 +32,26 @@ public class DungeonGenerator : MonoBehaviour
     public float genSpeed = 1.0f;
     public bool waitForGizmosGen = false;
 
+    //camera data
     public Camera cam;
     public Vector3 offset;
 
     Vector3 targetPos = Vector3.zero;
 
+    //node data
+    List<Node> deletedNodes = new List<Node>();
     Dictionary<Vector3, Node> knownPositions = new Dictionary<Vector3, Node>();
     Dictionary<Node, Room> nodeRoomPair = new Dictionary<Node, Room>();
-
-    List<Node> deletedNodes = new List<Node>(); //testing which nodes got deleted
-    List<Room> doors = new List<Room>();
-
-    PrefabDatabase database = new PrefabDatabase();
-    Room[] roomPreFabs = new Room[0];
-    EnemyType[] enemyPrefabs = new EnemyType[0];
-   
-
     Node root;
     Node currentNode;
-
     int totalRooms = 1;
     int nodeCount = 0;
 
+    PrefabDatabase database = new PrefabDatabase();
+
     void Start()
     {
+        database.LoadPrefabs();
         StartCoroutine(GenerateDungeon());
     }
 
@@ -68,16 +64,6 @@ public class DungeonGenerator : MonoBehaviour
     {
         database.LoadPrefabs();
 
-        //room prefabs
-        roomPreFabs = new Room[database.allRooms.Length];
-        for (int i = 0; i < database.allRooms.Length; i++)    
-            roomPreFabs[i] = database.allRooms[i];
-
-        //enemy prefabs
-        enemyPrefabs = new EnemyType[database.allEnemies.Length];
-        for (int i = 0; i < database.allEnemies.Length; i++)      
-            enemyPrefabs[i] = database.allEnemies[i];
-        
     }
 
     public IEnumerator GenerateDungeon()
@@ -90,7 +76,6 @@ public class DungeonGenerator : MonoBehaviour
         yield return StartCoroutine(GenerateNodes());
         yield return StartCoroutine(GenerateRooms());
         yield return StartCoroutine(GenerateCorridors());
-        //yield return StartCoroutine(GenerateEnemies());
 
         print($"Total Generated Rooms : {totalRooms} \nTotal Generated Corridors : {nodeCount}");
     }
@@ -102,9 +87,9 @@ public class DungeonGenerator : MonoBehaviour
         {
             //loop through each prefab set corrdorlength to be the highest x or z
             int maxLength = 0;
-            for (int i = 0; i < roomPreFabs.Length; i++)
+            for (int i = 0; i < database.allRooms.Length; i++)
             {
-                Vector3 scale = roomPreFabs[i].gameObject.transform.localScale;
+                Vector3 scale = database.allRooms[i].gameObject.transform.localScale;
 
                 if (scale.z > scale.x)
                     maxLength = (int)(scale.z > maxLength ? scale.z + 0.5f : maxLength);
@@ -114,9 +99,6 @@ public class DungeonGenerator : MonoBehaviour
             corridorLength = maxLength;
         }
     }
-
-
-
 
     IEnumerator GenerateCorridors()
     {
@@ -178,31 +160,18 @@ public class DungeonGenerator : MonoBehaviour
             yield return new WaitForSeconds(1.0f - genSpeed);
 
         //generate the room if the array isnt empty
-        if (node.isRoom && roomPreFabs.Length != 0)
+        if (node.isRoom && database.allRooms.Length != 0)
         {
-            Room roomPrefab = Instantiate(roomPreFabs[Random.Range(0, roomPreFabs.Length)], node.position, Quaternion.identity, transform);
+            Room roomPrefab = Instantiate(database.allRooms[Random.Range(0, database.allRooms.Length)], node.position, Quaternion.identity, transform);
 
             //pair every node with a room.
             nodeRoomPair.Add(node, roomPrefab);
             targetPos = node.position;
 
-            ////generate a random enemy in a random possble spawn.
-            //if (enemyPrefabs.Length > 0)
-            //{
-            //    //generate an enemy up to max times or until it fills the possible enemy spawns
-            //    for (int i = 0; i < roomPrefab.maxEnemyCount; i++)
-            //    {
-            //        EnemyType randEnemy = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
+            roomPrefab.SpawnEnemyPrefabs(database.allEnemies);
 
-            //        Vector3 randPos = roomPrefab.possibleEnemySpawns[Random.Range(0, roomPrefab.possibleEnemySpawns.Count)];
- 
-            //        EnemyType enemyPrefab = Instantiate(randEnemy, randPos, Quaternion.identity, transform);
-            //    }
-                
-            //}
 
-        }
-
+        } 
         //loop through the children and invoke the funtcion
         foreach (Node child in node.children)
             yield return StartCoroutine(GenerateRoom(child));

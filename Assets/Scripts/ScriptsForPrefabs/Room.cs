@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,10 +24,21 @@ public class Room : MonoBehaviour
     [Tooltip("List of item Spawn Locations")]
     public List<Vector3> itemLocations = new List<Vector3>();
 
-    private void Start()
+    public void SpawnEnemyPrefabs(EnemyType[] enemies)
     {
-        RestrictDoorCount();
-    }  
+        //temp list
+        List<Vector3> tempList = possibleEnemySpawns;
+
+        for (int i = 0; i < maxEnemyCount; i++)
+        {
+            EnemyType randEnemy = enemies[Random.Range(0, enemies.Length)];
+            //random pos
+            Vector3 randPos = tempList[Random.Range(0, tempList.Count)];
+            //instantiante
+
+            //remove item from list...
+        }
+    }
 
     void RestrictDoorCount()
     {
@@ -48,7 +58,7 @@ public class Room : MonoBehaviour
     void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
-        
+
         Gizmos.DrawWireCube(transform.position + boundsOffset, boundsSize);
 
         //every spawn locations draw a cube at the 
@@ -56,7 +66,7 @@ public class Room : MonoBehaviour
         {
             Gizmos.color = Color.red;
             Vector3 enemyPos = new Vector3(possibleEnemySpawns[i].x, possibleEnemySpawns[i].y, possibleEnemySpawns[i].z);
-            
+
             Gizmos.DrawWireCube(transform.position + enemyPos, Vector3.one);
         }
 
