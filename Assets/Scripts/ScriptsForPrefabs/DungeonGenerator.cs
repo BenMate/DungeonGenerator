@@ -6,26 +6,34 @@ public class DungeonGenerator : MonoBehaviour
 {
     [Header("Config")]
 
-    [Tooltip("Clamps CorridorLength to rooms size, helps prevent rooms from touching")]
+    [Tooltip("Clamps CorridorLength to Rooms Size, Helps Prevent Rooms from Touching")]
     public bool forceCorriderMin = false;
 
-    [Tooltip("The Total Length of the corridors")]
-    [Range(5.0f, 100.0f)]
+    
+    public int minRoomGap = 5;
+
+    [Tooltip("The Total Length of the Corridors")]
     public int corridorLength = 10;
 
-    [Tooltip("The Total Amount of Rooms That Will Be Generated")]
-    [Range(1, 200)]
+    [Tooltip("The Total Amount of Rooms that will be Generated (Big Numbers, Big Wait Time)")]
     public int roomCount = 5;
 
-    [Tooltip("The chances of Generating A Room")]
+    [Tooltip("The Chances of Generating a Room")]
     [Range(0, 100)]
     public int roomChance = 50;
 
-    [Tooltip("Max Amount of Times Rooms Can have segments between them")]
+    [Tooltip("Max Amount of Times Rooms Can have Segments Between them")]
     public int maxCorridorSegments = 2;
 
     [Header("GameObjects")]
     public GameObject corridorFloor;
+
+    [Header("DungeonDoor")]
+    [Tooltip("Make sure to add the 'DungeonDoor' Script to the prefab")]
+    public DungeonDoor dungeonDoor;
+
+    [Tooltip("Invert the way the door faces")]
+    public bool invertDoorDirection = false;
 
     [Header("Debug")]
     [Range(0.0f, 1.0f)]
@@ -42,7 +50,7 @@ public class DungeonGenerator : MonoBehaviour
     List<Node> deletedNodes = new List<Node>();
 
     Dictionary<Vector3, Node> knownPositions = new Dictionary<Vector3, Node>();
-    Dictionary<Node, Room> nodeRoomPair = new Dictionary<Node, Room>();
+    Dictionary<Node, DungeonRoom> nodeRoomPair = new Dictionary<Node, DungeonRoom>();
 
     Node root;
     Node currentNode;
@@ -82,115 +90,13 @@ public class DungeonGenerator : MonoBehaviour
         print($"Total Generated Rooms : {totalRooms} \nTotal Generated Corridors : {nodeCount}");
     }
 
-    private void CalculateCorridorLength()
-    {
-        //set min corridor length
-        if (forceCorriderMin)
-        {
-            //loop through each prefab set corrdorlength to be the highest x or z
-            int maxLength = 0;
-            for (int i = 0; i < database.allRooms.Length; i++)
-            {
-                Vector3 scale = database.allRooms[i].gameObject.transform.localScale;
-
-                if (scale.z > scale.x)
-                    maxLength = (int)(scale.z > maxLength ? scale.z + 0.5f : maxLength);
-                else
-                    maxLength = (int)(scale.x > maxLength ? scale.x + 0.5f : maxLength);
-            }
-            corridorLength = maxLength;
-        }
-    }
-
     IEnumerator GenerateCorridors()
     {
         yield return StartCoroutine(GenerateCorridor(root));
     }
-
-    IEnumerator GenerateCorridor(Node node)
-    {
-        //set the gen speed
-        if (genSpeed < 1.0f)
-            yield return new WaitForSeconds(1.0f - genSpeed);
-
-        //loop through the nodes children and generates a corridor for each child
-        foreach (Node child in node.children)
-        {
-            //get the direction the parrent is to the child
-            Vector3 dir = child.position - node.position;
-            dir.Normalize();
-
-            //set the node offset and size
-            Vector3 nodePosOffset = node.position + (node.isRoom ? nodeRoomPair[node].boundsOffset : Vector3.zero);
-            Vector3 nodePosSize = node.isRoom ? nodeRoomPair[node].boundsSize : Vector3.zero;
-
-            //set the childs size and offset
-            Vector3 childPosOffset = child.position + (child.isRoom ? nodeRoomPair[child].boundsOffset : Vector3.zero);
-            Vector3 childPosSize = child.isRoom ? nodeRoomPair[child].boundsSize : Vector3.zero;
-
-            //make the offset y = 0 to keep on the same level
-            Vector3 nodeXZOffset = new Vector3(nodePosOffset.x, 0, nodePosOffset.z);
-            nodeXZOffset += Vector3.Scale(dir, nodePosSize) / 2;
-
-            childPosOffset += Vector3.Scale(-dir, childPosSize) / 2;
-            Vector3 childXZOffSet = new Vector3(childPosOffset.x, 0, childPosOffset.z);
-
-            //calculate where the offsets are and midpoint
-            Vector3 difference = nodeXZOffset - childXZOffSet;
-            Vector3 midPoint = (nodeXZOffset + childXZOffSet) / 2;
-
-            GameObject corridor = Instantiate(corridorFloor, midPoint, Quaternion.identity, transform);
-            targetPos = midPoint;
-
-            if (difference.z != 0)
-                corridor.transform.localScale = new Vector3(1, 1, Mathf.Abs(difference.z));
-            else if (difference.x != 0)
-                corridor.transform.localScale = new Vector3(Mathf.Abs(difference.x), 1, 1);
-
-            //if node .isroom = true TODO
-            GameObject nodeDoor = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            GameObject childDoor = GameObject.CreatePrimitive(PrimitiveType.Cube);
-
-        
-            nodeDoor.transform.position = nodeXZOffset;
-            nodeDoor.transform.localScale = Vector3.one * 4;
-
-            childDoor.transform.position = childXZOffSet;
-            childDoor.transform.localScale = Vector3.one * 4;
-
-
-
-            yield return StartCoroutine(GenerateCorridor(child));
-        }
-    }
-
     IEnumerator GenerateRooms()
     {
         yield return StartCoroutine(GenerateRoom(root));
-    }
-
-    IEnumerator GenerateRoom(Node node)
-    {
-        if (genSpeed < 1.0f)
-            yield return new WaitForSeconds(1.0f - genSpeed);
-
-
-
-        //generate the room if the array isnt empty
-        if (node.isRoom && database.allRooms.Length != 0)
-        {
-            Room roomPrefab = Instantiate(database.allRooms[Random.Range(0, database.allRooms.Length)], node.position, Quaternion.identity, roomContainer.transform);
-
-            //pair every node with a room.
-            nodeRoomPair.Add(node, roomPrefab);
-            targetPos = node.position;
-
-            roomPrefab.SpawnEnemyPrefabs(database.allEnemies, enemyContainer.transform);
-
-        }
-        //loop through the children and invoke the funtcion
-        foreach (Node child in node.children)
-            yield return StartCoroutine(GenerateRoom(child));
     }
 
     IEnumerator GenerateNodes()
@@ -252,6 +158,117 @@ public class DungeonGenerator : MonoBehaviour
             RemoveDeadEnd(leaf);
 
     }
+    IEnumerator GenerateRoom(Node node)
+    {
+        if (genSpeed < 1.0f)
+            yield return new WaitForSeconds(1.0f - genSpeed);
+
+        //generate the room if the array isnt empty
+        if (node.isRoom && database.allRooms.Length != 0)
+        {
+            DungeonRoom roomPrefab = Instantiate(database.allRooms[Random.Range(0, database.allRooms.Length)], node.position, Quaternion.identity, roomContainer.transform);
+
+            //pair every node with a room.
+            nodeRoomPair.Add(node, roomPrefab);
+            targetPos = node.position;
+
+            roomPrefab.SpawnEnemyPrefabs(database.allEnemies, enemyContainer.transform);
+
+        }
+        //loop through the children and invoke the funtcion
+        foreach (Node child in node.children)
+            yield return StartCoroutine(GenerateRoom(child));
+    }
+
+    private void CalculateCorridorLength()
+    {
+        //set min corridor length
+        if (forceCorriderMin)
+        {
+            //loop through each prefab set corrdorlength to be the highest x or z
+            int maxLength = 0;
+
+            if (database.allRooms.Length == 0)
+                return;
+
+            for (int i = 0; i < database.allRooms.Length; i++)
+            {
+                Vector3 scale = database.allRooms[i].gameObject.transform.localScale;
+
+                if (scale.z > scale.x)
+                    maxLength = (int)(scale.z > maxLength ? scale.z + 5.5f : maxLength);
+                else
+                    maxLength = (int)(scale.x > maxLength ? scale.x + 5.5f : maxLength);
+            }
+            corridorLength = maxLength;
+        }
+    }
+
+    IEnumerator GenerateCorridor(Node node)
+    {
+        //set the gen speed
+        if (genSpeed < 1.0f)
+            yield return new WaitForSeconds(1.0f - genSpeed);
+
+        //loop through the nodes children and generates a corridor with a door on each end
+        foreach (Node child in node.children)
+        {
+            //get the direction the parrent is to the child
+            Vector3 dir = child.position - node.position;
+            dir.Normalize();
+
+            //set the node offset and size
+            Vector3 nodePosOffset = node.position + (node.isRoom ? nodeRoomPair[node].boundsOffset : Vector3.zero);
+            Vector3 nodePosSize = node.isRoom ? nodeRoomPair[node].boundsSize : Vector3.zero;
+
+            //set the childs size and offset
+            Vector3 childPosOffset = child.position + (child.isRoom ? nodeRoomPair[child].boundsOffset : Vector3.zero);
+            Vector3 childPosSize = child.isRoom ? nodeRoomPair[child].boundsSize : Vector3.zero;
+
+            //make the offset y = 0 to keep on the same level
+            Vector3 nodeXZOffset = new Vector3(nodePosOffset.x, 0, nodePosOffset.z);
+            nodeXZOffset += Vector3.Scale(dir, nodePosSize) / 2;
+
+            childPosOffset += Vector3.Scale(-dir, childPosSize) / 2;
+            Vector3 childXZOffSet = new Vector3(childPosOffset.x, 0, childPosOffset.z);
+
+            //calculate where the offsets are and midpoint
+            Vector3 difference = nodeXZOffset - childXZOffSet;
+            Vector3 midPoint = (nodeXZOffset + childXZOffSet) / 2;
+
+            //spawn prefab
+            if (corridorFloor != null)
+            {
+                GameObject corridor = Instantiate(corridorFloor, midPoint, Quaternion.identity, transform);
+                targetPos = midPoint;
+
+                if (difference.z != 0)
+                    corridor.transform.localScale = new Vector3(1, 1, Mathf.Abs(difference.z));
+                else if (difference.x != 0)
+                    corridor.transform.localScale = new Vector3(Mathf.Abs(difference.x), 1, 1);
+            }
+
+            GenerateDoors(node, child, nodeXZOffset, childXZOffSet, dir);
+
+            yield return StartCoroutine(GenerateCorridor(child));
+        }
+    }
+
+    void GenerateDoors(Node node, Node child, Vector3 nodeOffset, Vector3 childOffset, Vector3 direction)
+    {
+        if (dungeonDoor == null)
+        {
+            Debug.LogWarning("DungeonDoor - Missing a Prefab with an attached dungeonDoor script");
+            return;
+        }
+
+        if (node.isRoom)
+            Instantiate(dungeonDoor, nodeOffset, Quaternion.Euler(0, Vector3.SignedAngle(transform.forward, invertDoorDirection ? direction : -direction, Vector3.up), 0), transform);
+
+        if (child.isRoom)
+            Instantiate(dungeonDoor, childOffset, Quaternion.Euler(0, Vector3.SignedAngle(transform.forward, invertDoorDirection ? -direction : direction, Vector3.up), 0), transform);
+
+    }
 
     void DestroyAllChildren()
     {
@@ -291,18 +308,6 @@ public class DungeonGenerator : MonoBehaviour
     }
 
     //debug functions
-    void OnDrawGizmos()
-    {
-        if (root != null)
-            DrawNode(root);
-
-        foreach (Node node in deletedNodes)
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawSphere(node.position, 1);
-        }
-    }
-
     void DrawNode(Node node)
     {
         Gizmos.color = Color.red;
@@ -322,6 +327,20 @@ public class DungeonGenerator : MonoBehaviour
             Gizmos.DrawLine(node.position, child.position);
         }
     }
+
+    void OnDrawGizmos()
+    {
+        if (root != null)
+            DrawNode(root);
+
+        foreach (Node node in deletedNodes)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(node.position, 1);
+        }
+    }
+
+
 }
 
 

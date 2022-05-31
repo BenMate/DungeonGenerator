@@ -614,11 +614,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   forceCorriderMin: 1
-  corridorLength: 11
-  roomCount: 18
+  minRoomGap: 5
+  corridorLength: 70
+  roomCount: 22
   roomChance: 63
   maxCorridorSegments: 50
   corridorFloor: {fileID: 1949073592566165718, guid: 13093b83171939548952a3ce21bd3c27, type: 3}
+  dungeonDoor: {fileID: 4345193547893194889, guid: 7069e7e685873424db040d14b80a4a33, type: 3}
+  invertDoorDirection: 0
   genSpeed: 0.955
   waitForGizmosGen: 0
   cam: {fileID: 963194227}
@@ -858,9 +861,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boundsOffset: {x: 0, y: 0, z: 0}
   boundsSize: {x: 1, y: 1, z: 1}
-  doorList: []
   possibleEnemySpawns: []
   maxEnemyCount: 1
+  minEnemyCount: 0
   itemLocations: []
 --- !u!4 &1846290874
 Transform:

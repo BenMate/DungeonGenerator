@@ -4,19 +4,22 @@ using UnityEngine;
 
 public class PrefabDatabase
 {
-    public Room[] allRooms;
+    public DungeonRoom[] allRooms;
     public EnemyType[] allEnemies;
+    public DungeonDoor[] allDoors;
+
     //items
 
     public void LoadPrefabs()
     {
-        allRooms = Resources.LoadAll<Room>("Rooms");
-        allEnemies = Resources.LoadAll<EnemyType>("Enemies");
-
+        allRooms = Resources.LoadAll<DungeonRoom>("DungeonResources/Rooms");
+        allEnemies = Resources.LoadAll<EnemyType>("DungeonResources/Enemies");
+    
         if (allRooms.Length == 0)
-            Debug.Log("PrefabDatabase - Could not find room Prefabs with 'Room' script attatched");
+            Debug.LogWarning("PrefabDatabase - Could not find any Room Prefabs with 'Room' script attatched");
 
         if (allEnemies.Length == 0)
-            Debug.Log("PrefabDatabase - Could not find enemy prefabs with 'EnemyType' script attacthed");
+            Debug.LogWarning("PrefabDatabase - Could not find any Enemy prefabs with 'EnemyType' script attacthed");
+        
     }
 }

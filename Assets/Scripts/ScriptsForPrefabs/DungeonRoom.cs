@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Room : MonoBehaviour
+public class DungeonRoom : MonoBehaviour
 {
     [Header("Bounds Config")]
     [Tooltip("The Bounds of the room, the corridors will scale to the bounds")]
@@ -30,11 +30,11 @@ public class Room : MonoBehaviour
     {
         posList = possibleEnemySpawns;
 
+        if (posList.Count == 0 || enemies.Length == 0)
+            return;
+
         for (int i = 0; i < Random.Range(minEnemyCount, maxEnemyCount); i++)
         {
-            if (posList.Count == 0 || enemies.Length == 0)
-                break;
-
             //spawn random enemy on a random position, shrink list
             int randIndex = Random.Range(0, posList.Count);
             EnemyType randEnemy = enemies[Random.Range(0, enemies.Length)];
@@ -44,7 +44,6 @@ public class Room : MonoBehaviour
 
             EnemyType enemyPrefab = Instantiate(randEnemy, parent);
             enemyPrefab.transform.position = randPos + transform.position;
-
         }
     }
 
@@ -70,7 +69,7 @@ public class Room : MonoBehaviour
         foreach (Transform child in parent)
         {
             Renderer renderer = child.GetComponent<Renderer>();
-            
+
             if (renderer != null)
                 blocker.Encapsulate(renderer.bounds);
 
