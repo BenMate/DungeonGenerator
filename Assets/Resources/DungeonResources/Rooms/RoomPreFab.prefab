@@ -110,9 +110,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boundsOffset: {x: 0, y: 0, z: 0}
   boundsSize: {x: 18.996367, y: 1.5935291, z: 20.283758}
-  doorList: []
   possibleEnemySpawns:
   - {x: 0, y: 8.11, z: 0}
   maxEnemyCount: 1
   minEnemyCount: 1
   itemLocations: []
+  doorPrefab: {fileID: 7396109557337260494, guid: 7069e7e685873424db040d14b80a4a33, type: 3}
+  wallFillerPrefab: {fileID: 7396109557337260494, guid: 05bcddfebc53d014792222f4ef29bfe1, type: 3}

@@ -9,7 +9,6 @@ public class DungeonRoom : MonoBehaviour
     public Vector3 boundsOffset = Vector3.zero;
     public Vector3 boundsSize = Vector3.one;
 
-
     [Header("Enemys Config - Red")]
     [Tooltip("Create a list of possible enemy spawns")]
     public List<Vector3> possibleEnemySpawns = new List<Vector3>();
@@ -21,10 +20,40 @@ public class DungeonRoom : MonoBehaviour
     public int minEnemyCount = 0;
 
     [Header("Item Config - Cyan")]
-    [Tooltip("List of item Spawn Locations")]
+    [Tooltip("List of Item Spawn Locations")]
     public List<Vector3> itemLocations = new List<Vector3>();
 
+    [Tooltip("All Doors have to be the same Size")]
+    public GameObject doorPrefab;
+
+    [Tooltip("Replacement for the Door (Same Size)")]
+    public GameObject wallFillerPrefab;
+
     List<Vector3> posList = new List<Vector3>();
+
+    bool left, right, back, forward;
+
+    public void SetCorridorDirection(Vector3 direction)
+    {
+        if (direction == Vector3.left)
+            left = true;
+        else if (direction == Vector3.right)
+            right = true;
+        else if(direction == Vector3.back)
+            back = true;
+        else if(direction == Vector3.forward)
+            forward = true;
+    }
+
+    public void GenerateDoors()
+    {
+
+        Instantiate(forward ? doorPrefab : wallFillerPrefab, transform.position + Vector3.forward * boundsSize.z / 2, Quaternion.Euler(0, 180, 0));
+        Instantiate(back ? doorPrefab : wallFillerPrefab, transform.position + Vector3.back * boundsSize.z / 2, Quaternion.Euler(0, 0, 0));
+        Instantiate(right ? doorPrefab : wallFillerPrefab, transform.position + Vector3.right * boundsSize.x / 2, Quaternion.Euler(0, 270, 0));
+        Instantiate(left ? doorPrefab : wallFillerPrefab, transform.position + Vector3.left * boundsSize.x / 2, Quaternion.Euler(0, 90, 0));
+
+    }
 
     public void SpawnEnemyPrefabs(EnemyType[] enemies, Transform parent = null)
     {

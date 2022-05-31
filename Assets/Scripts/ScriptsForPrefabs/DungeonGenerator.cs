@@ -9,7 +9,7 @@ public class DungeonGenerator : MonoBehaviour
     [Tooltip("Clamps CorridorLength to Rooms Size, Helps Prevent Rooms from Touching")]
     public bool forceCorriderMin = false;
 
-    
+
     public int minRoomGap = 5;
 
     [Tooltip("The Total Length of the Corridors")]
@@ -50,7 +50,6 @@ public class DungeonGenerator : MonoBehaviour
     List<Node> deletedNodes = new List<Node>();
 
     Dictionary<Vector3, Node> knownPositions = new Dictionary<Vector3, Node>();
-    Dictionary<Node, DungeonRoom> nodeRoomPair = new Dictionary<Node, DungeonRoom>();
 
     Node root;
     Node currentNode;
@@ -86,8 +85,14 @@ public class DungeonGenerator : MonoBehaviour
         yield return StartCoroutine(GenerateNodes());
         yield return StartCoroutine(GenerateRooms());
         yield return StartCoroutine(GenerateCorridors());
+        yield return StartCoroutine(GenerateRoomDoors());
+
 
         print($"Total Generated Rooms : {totalRooms} \nTotal Generated Corridors : {nodeCount}");
+    }
+    IEnumerator GenerateRoomDoors()
+    {
+        yield return StartCoroutine(GenerateRoomDoor(root));
     }
 
     IEnumerator GenerateCorridors()
@@ -168,8 +173,7 @@ public class DungeonGenerator : MonoBehaviour
         {
             DungeonRoom roomPrefab = Instantiate(database.allRooms[Random.Range(0, database.allRooms.Length)], node.position, Quaternion.identity, roomContainer.transform);
 
-            //pair every node with a room.
-            nodeRoomPair.Add(node, roomPrefab);
+            node.room = roomPrefab;
             targetPos = node.position;
 
             roomPrefab.SpawnEnemyPrefabs(database.allEnemies, enemyContainer.transform);
@@ -218,12 +222,12 @@ public class DungeonGenerator : MonoBehaviour
             dir.Normalize();
 
             //set the node offset and size
-            Vector3 nodePosOffset = node.position + (node.isRoom ? nodeRoomPair[node].boundsOffset : Vector3.zero);
-            Vector3 nodePosSize = node.isRoom ? nodeRoomPair[node].boundsSize : Vector3.zero;
+            Vector3 nodePosOffset = node.position + (node.isRoom ? node.room.boundsOffset : Vector3.zero);
+            Vector3 nodePosSize = node.isRoom ? node.room.boundsSize : Vector3.zero;
 
             //set the childs size and offset
-            Vector3 childPosOffset = child.position + (child.isRoom ? nodeRoomPair[child].boundsOffset : Vector3.zero);
-            Vector3 childPosSize = child.isRoom ? nodeRoomPair[child].boundsSize : Vector3.zero;
+            Vector3 childPosOffset = child.position + (child.isRoom ? child.room.boundsOffset : Vector3.zero);
+            Vector3 childPosSize = child.isRoom ? child.room.boundsSize : Vector3.zero;
 
             //make the offset y = 0 to keep on the same level
             Vector3 nodeXZOffset = new Vector3(nodePosOffset.x, 0, nodePosOffset.z);
@@ -248,25 +252,28 @@ public class DungeonGenerator : MonoBehaviour
                     corridor.transform.localScale = new Vector3(Mathf.Abs(difference.x), 1, 1);
             }
 
-            GenerateDoors(node, child, nodeXZOffset, childXZOffSet, dir);
+            if (node.isRoom)
+                node.room.SetCorridorDirection(dir);
+            
+            if (child.isRoom)   
+                child.room.SetCorridorDirection(-dir);
 
             yield return StartCoroutine(GenerateCorridor(child));
         }
     }
 
-    void GenerateDoors(Node node, Node child, Vector3 nodeOffset, Vector3 childOffset, Vector3 direction)
+    IEnumerator GenerateRoomDoor(Node node)
     {
-        if (dungeonDoor == null)
-        {
-            Debug.LogWarning("DungeonDoor - Missing a Prefab with an attached dungeonDoor script");
-            return;
-        }
+        //set the gen speed
+        if (genSpeed < 1.0f)
+            yield return new WaitForSeconds(1.0f - genSpeed);
 
-        if (node.isRoom)
-            Instantiate(dungeonDoor, nodeOffset, Quaternion.Euler(0, Vector3.SignedAngle(transform.forward, invertDoorDirection ? direction : -direction, Vector3.up), 0), transform);
+        if (node.isRoom)   
+            node.room.GenerateDoors(); 
+        
+        foreach (Node child in node.children)
+            yield return StartCoroutine(GenerateRoomDoor(child));
 
-        if (child.isRoom)
-            Instantiate(dungeonDoor, childOffset, Quaternion.Euler(0, Vector3.SignedAngle(transform.forward, invertDoorDirection ? -direction : direction, Vector3.up), 0), transform);
 
     }
 

@@ -12,6 +12,8 @@ public class Node
 
     public bool isRoom = true;
 
+    public DungeonRoom room = null;
+
     public Node(Vector3 position)
     {
         this.position = position;
