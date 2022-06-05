@@ -613,16 +613,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83fff389a1e9c694b9e61f37c0788c00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  GenerateDeadEnds: 0
   forceCorriderMin: 1
-  minRoomGap: 5
-  corridorLength: 70
-  roomCount: 22
-  roomChance: 63
+  minRoomGap: 40
+  corridorLength: 50
+  roomCount: 1000
+  roomChance: 100
   maxCorridorSegments: 50
   corridorFloor: {fileID: 1949073592566165718, guid: 13093b83171939548952a3ce21bd3c27, type: 3}
   dungeonDoor: {fileID: 4345193547893194889, guid: 7069e7e685873424db040d14b80a4a33, type: 3}
   invertDoorDirection: 0
-  genSpeed: 0.955
+  genSpeed: 1
   waitForGizmosGen: 0
   cam: {fileID: 963194227}
   offset: {x: 0, y: 400, z: -300}
@@ -634,7 +635,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1185741373}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 42.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -865,6 +866,9 @@ MonoBehaviour:
   maxEnemyCount: 1
   minEnemyCount: 0
   itemLocations: []
+  doorOffset: 0.1
+  doorPrefab: {fileID: 0}
+  wallFillerPrefab: {fileID: 0}
 --- !u!4 &1846290874
 Transform:
   m_ObjectHideFlags: 0

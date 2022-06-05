@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 4859146331640433403}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.25, z: 0}
-  m_LocalScale: {x: 1.5, y: 2.5, z: 0.25}
+  m_LocalScale: {x: 1.5, y: 2.5, z: 0.3}
   m_Children: []
   m_Father: {fileID: 3861980772611352442}
   m_RootOrder: 0
@@ -106,7 +106,7 @@ GameObject:
   - component: {fileID: 3861980772611352442}
   - component: {fileID: 4345193547893194889}
   m_Layer: 0
-  m_Name: Door 1
+  m_Name: Wall 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

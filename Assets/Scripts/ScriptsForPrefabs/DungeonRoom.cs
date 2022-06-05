@@ -23,6 +23,11 @@ public class DungeonRoom : MonoBehaviour
     [Tooltip("List of Item Spawn Locations")]
     public List<Vector3> itemLocations = new List<Vector3>();
 
+    [Header("Door Config")]
+
+    [Tooltip("the door/wallfiller will spawn on the edge, the offset will move it closer or further")]
+    public float doorOffset = 0.0f;
+
     [Tooltip("All Doors have to be the same Size")]
     public GameObject doorPrefab;
 
@@ -48,10 +53,17 @@ public class DungeonRoom : MonoBehaviour
     public void GenerateDoors()
     {
 
-        Instantiate(forward ? doorPrefab : wallFillerPrefab, transform.position + Vector3.forward * boundsSize.z / 2, Quaternion.Euler(0, 180, 0));
-        Instantiate(back ? doorPrefab : wallFillerPrefab, transform.position + Vector3.back * boundsSize.z / 2, Quaternion.Euler(0, 0, 0));
-        Instantiate(right ? doorPrefab : wallFillerPrefab, transform.position + Vector3.right * boundsSize.x / 2, Quaternion.Euler(0, 270, 0));
-        Instantiate(left ? doorPrefab : wallFillerPrefab, transform.position + Vector3.left * boundsSize.x / 2, Quaternion.Euler(0, 90, 0));
+        GameObject doorOrWall = Instantiate(forward ? doorPrefab : wallFillerPrefab, transform.position + Vector3.forward * boundsSize.z / 2, Quaternion.Euler(0, 180, 0));
+        doorOrWall.transform.position -= new Vector3(0, 0, doorOffset);
+
+        GameObject doorOrWall2 = Instantiate(back ? doorPrefab : wallFillerPrefab, transform.position + Vector3.back * boundsSize.z / 2, Quaternion.Euler(0, 0, 0));
+        doorOrWall2.transform.position -= new Vector3(0, 0, -doorOffset);
+
+        GameObject doorOrWall3 = Instantiate(right ? doorPrefab : wallFillerPrefab, transform.position + Vector3.right * boundsSize.x / 2, Quaternion.Euler(0, 270, 0));
+        doorOrWall3.transform.position -= new Vector3(doorOffset, 0, 0);
+
+        GameObject doorOrWall4 = Instantiate(left ? doorPrefab : wallFillerPrefab, transform.position + Vector3.left * boundsSize.x / 2, Quaternion.Euler(0, 90, 0));
+        doorOrWall4.transform.position -= new Vector3(-doorOffset, 0, 0);
 
     }
 
@@ -110,7 +122,8 @@ public class DungeonRoom : MonoBehaviour
     void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
-
+        
+        //draw the bounds
         Gizmos.DrawWireCube(transform.position + boundsOffset, boundsSize);
 
         //every spawn locations draw a cube at the 
@@ -119,7 +132,7 @@ public class DungeonRoom : MonoBehaviour
             Gizmos.color = Color.red;
             Vector3 enemyPos = new Vector3(possibleEnemySpawns[i].x, possibleEnemySpawns[i].y, possibleEnemySpawns[i].z);
 
-            Gizmos.DrawWireCube(transform.position + enemyPos, Vector3.one);
+            Gizmos.DrawSphere(transform.position + enemyPos, 0.2f);
         }
 
         //every item locations

@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 9060575384798780263}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 157.72241, y: -0.7213457, z: 90.80175}
+  m_LocalScale: {x: 20, y: 1, z: 20}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -109,11 +109,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boundsOffset: {x: 0, y: 0, z: 0}
-  boundsSize: {x: 157.72241, y: 0.7213457, z: 90.80175}
+  boundsSize: {x: 20, y: 1, z: 20}
   possibleEnemySpawns:
-  - {x: 0, y: 5.81, z: 0}
+  - {x: 0, y: 0, z: 0}
   maxEnemyCount: 1
   minEnemyCount: 1
   itemLocations: []
+  doorOffset: 0
   doorPrefab: {fileID: 7396109557337260494, guid: 7069e7e685873424db040d14b80a4a33, type: 3}
   wallFillerPrefab: {fileID: 7396109557337260494, guid: 05bcddfebc53d014792222f4ef29bfe1, type: 3}

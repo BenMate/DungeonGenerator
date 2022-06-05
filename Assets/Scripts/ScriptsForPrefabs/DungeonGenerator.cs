@@ -6,16 +6,20 @@ public class DungeonGenerator : MonoBehaviour
 {
     [Header("Config")]
 
+    [Tooltip("Can Corridors Lead to Nothing")]
+    public bool GenerateDeadEnds = false;
+
     [Tooltip("Clamps CorridorLength to Rooms Size, Helps Prevent Rooms from Touching")]
     public bool forceCorriderMin = false;
 
-
+    [Tooltip("The Amount of Corridor Space Between each Room")]
     public int minRoomGap = 5;
 
     [Tooltip("The Total Length of the Corridors")]
     public int corridorLength = 10;
 
     [Tooltip("The Total Amount of Rooms that will be Generated (Big Numbers, Big Wait Time)")]
+    [Range(0, 1000)]
     public int roomCount = 5;
 
     [Tooltip("The Chances of Generating a Room")]
@@ -159,8 +163,11 @@ public class DungeonGenerator : MonoBehaviour
         List<Node> leafNodes = new List<Node>();
         leafNodes.AddRange(GetLeafNodes(root));
 
-        foreach (Node leaf in leafNodes)
-            RemoveDeadEnd(leaf);
+        if (!GenerateDeadEnds)  
+        {
+            foreach (Node leaf in leafNodes)
+                RemoveDeadEnd(leaf);
+        }     
 
     }
     IEnumerator GenerateRoom(Node node)
@@ -273,8 +280,6 @@ public class DungeonGenerator : MonoBehaviour
         
         foreach (Node child in node.children)
             yield return StartCoroutine(GenerateRoomDoor(child));
-
-
     }
 
     void DestroyAllChildren()
@@ -288,7 +293,6 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
     }
-
     void RemoveDeadEnd(Node node)
     {
         if (node.children.Count == 0 && node.parent != null && !node.isRoom)
