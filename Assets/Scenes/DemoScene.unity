@@ -333,7 +333,7 @@ MonoBehaviour:
   minRoomGap: 5
   corridorLength: 11
   roomCount: 32
-  roomChance: 100
+  roomChance: 59
   maxCorridorSegments: 50
   corridorSegment: {fileID: 8041432648202843657, guid: 653b9d56a5dcd624cb0e427196a63e19, type: 3}
   corridorEndSegment: {fileID: 8041432648202843657, guid: 653b9d56a5dcd624cb0e427196a63e19, type: 3}

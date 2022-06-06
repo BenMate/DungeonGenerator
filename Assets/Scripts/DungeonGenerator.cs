@@ -149,11 +149,11 @@ public class DungeonGenerator : MonoBehaviour
         List<Node> leafNodes = new List<Node>();
         leafNodes.AddRange(GetLeafNodes(root));
 
-        if (!GenerateDeadEnds)  
+        if (!GenerateDeadEnds)
         {
             foreach (Node leaf in leafNodes)
                 RemoveDeadEnd(leaf);
-        }     
+        }
 
     }
     IEnumerator GenerateRoom(Node node)
@@ -230,99 +230,58 @@ public class DungeonGenerator : MonoBehaviour
             childPosOffset += Vector3.Scale(-dir, childPosSize) / 2;
             Vector3 childXZOffSet = new Vector3(childPosOffset.x, 0, childPosOffset.z);
 
-            //calculate where the offsets are and midpoint
+            //calculate where the offsets are
             Vector3 difference = nodeXZOffset - childXZOffSet;
-            Vector3 midPoint = (nodeXZOffset + childXZOffSet) / 2;
 
             //round difference to an abs
             Vector3 differenceABS = new Vector3(Mathf.Abs(difference.x), Mathf.Abs(difference.y), Mathf.Abs(difference.z));
             Vector3 differenceRoundedABS = new Vector3(Mathf.RoundToInt(differenceABS.x), Mathf.RoundToInt(differenceABS.y), Mathf.RoundToInt(differenceABS.z));
 
-            float tempLength = 4;
+            float tempLength = 3;
 
             //spawn prefab
             if (corridorSegment != null)
             {
-                //temp segment length- todo add bounds and change 3 to bounds length
-                //calculate how many segments we need on the z axis
-                if (differenceRoundedABS.normalized == Vector3.forward)
-                {                 
-                    int segmentCount = Mathf.FloorToInt(differenceRoundedABS.z / tempLength);
+                
 
-                    float offset = (segmentCount / 2) * tempLength;
+                //how many segments are needed to be placed and total length
+                float totalLength = (Vector3.Distance(difference, Vector3.zero));
+                int segmentCount = (int)(totalLength / tempLength);
 
-                    if (segmentCount % tempLength == 0)
-                        offset -= tempLength / 2.0f;
+                //the total length of all segments
+                float totalSegmentLength = segmentCount * tempLength;
 
-                    for (int i = 0; i < segmentCount; i++)
-                    {
-                        Vector3 segmentPos = new Vector3(midPoint.x, midPoint.y, midPoint.z + (i * tempLength) - offset);
-                        Instantiate(corridorSegment, segmentPos, Quaternion.identity, transform);
-                    }
+                //the remainder of length from the bounds 
+                float remainderLength = totalLength - totalSegmentLength;
 
-                    //genereate end points
+                //how much to scale each segment
+                float segmentScale = remainderLength / segmentCount;
 
-                    //length
-                    float segmentsTotalLength = segmentCount * tempLength;
-                    //scale
-                    float endSegmentLength = (differenceABS.z - segmentsTotalLength) / 2.0f;
+                Vector3 dirOffset = difference.normalized * (tempLength + segmentScale);
 
-                    if (endSegmentLength > 0)
-                    {
-                        Vector3 endPos1 = new Vector3(midPoint.x, midPoint.y, midPoint.z + differenceABS.z / 2 - (endSegmentLength / 2));
 
-                        GameObject endSeg1 = Instantiate(corridorEndSegment, endPos1, Quaternion.identity, transform);
-                        endSeg1.transform.localScale = new Vector3(endSeg1.transform.localScale.x, endSeg1.transform.localScale.y, endSegmentLength / tempLength);
-
-                        Vector3 endPos2 = new Vector3(midPoint.x, midPoint.y, midPoint.z - differenceABS.z / 2 + (endSegmentLength / 2));
-
-                        GameObject endSeg2 = Instantiate(corridorEndSegment, endPos2, Quaternion.identity, transform);
-                        endSeg2.transform.localScale = new Vector3(endSeg2.transform.localScale.x, endSeg2.transform.localScale.y, endSegmentLength / tempLength);
-                    }
-                }
-                //calculate how many segments we need on the x axis
-                else if (differenceRoundedABS.normalized == Vector3.right)
+                for (int i = 0; i < segmentCount; i++)
                 {
-                    int segmentCount = Mathf.FloorToInt(differenceRoundedABS.x / tempLength);
-
-                    float offset = (segmentCount / 2) * tempLength;
-
-                    if (segmentCount % tempLength == 0)
-                        offset -= tempLength / 2.0f;
-
-                    for (int i = 0; i < segmentCount; i++)
-                    {
-                        Vector3 segmentPos = new Vector3(midPoint.x + (i * tempLength) - offset, midPoint.y, midPoint.z);
-                        Instantiate(corridorSegment, segmentPos, Quaternion.identity, transform);
-                    }
-
-                    //genereate end points
-                    
-                    //length
-                    float segmentsTotalLength = segmentCount * tempLength;
-                    //scale
-                    float endSegmentLength = (differenceABS.x - segmentsTotalLength) / 2.0f;
-
-                    if (endSegmentLength > 0)
-                    {
-                        Vector3 endPos1 = new Vector3(midPoint.x + differenceABS.x / 2 - (endSegmentLength / 2), midPoint.y, midPoint.z);
-
-                        GameObject endSeg1 = Instantiate(corridorEndSegment, endPos1, Quaternion.identity, transform);
-                        endSeg1.transform.localScale = new Vector3(endSegmentLength / tempLength, endSeg1.transform.localScale.y, endSeg1.transform.localScale.z);
-
-                        Vector3 endPos2 = new Vector3(midPoint.x - differenceABS.x / 2 + (endSegmentLength / 2), midPoint.y, midPoint.z);
-
-                        GameObject endSeg2 = Instantiate(corridorEndSegment, endPos2, Quaternion.identity, transform);
-                        endSeg2.transform.localScale = new Vector3(endSegmentLength / tempLength, endSeg2.transform.localScale.y, endSeg2.transform.localScale.z);
-                    }
+                    GameObject segment = Instantiate(corridorSegment, nodeXZOffset - dirOffset * i - dirOffset / 2, Quaternion.identity, transform);
+                    Vector3 scale = segment.transform.localScale * (segmentScale / tempLength);
+                    segment.transform.localScale += new Vector3(scale.x, 0, scale.z);
 
                 }
+
+
+
+
+
+                //get which node to spawn at
+
+                //
+
             }
 
             if (node.isRoom)
                 node.room.SetCorridorDirection(dir);
-            
-            if (child.isRoom)   
+
+            if (child.isRoom)
                 child.room.SetCorridorDirection(-dir);
 
             yield return StartCoroutine(GenerateCorridor(child));
@@ -335,9 +294,9 @@ public class DungeonGenerator : MonoBehaviour
         if (genSpeed < 1.0f)
             yield return new WaitForSeconds(1.0f - genSpeed);
 
-        if (node.isRoom)   
-            node.room.GenerateDoors(); 
-        
+        if (node.isRoom)
+            node.room.GenerateDoors();
+
         foreach (Node child in node.children)
             yield return StartCoroutine(GenerateRoomDoor(child));
     }
