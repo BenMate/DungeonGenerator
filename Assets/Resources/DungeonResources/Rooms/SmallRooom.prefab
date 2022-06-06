@@ -1229,6 +1229,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boundsOffset: {x: 0, y: 1, z: 0}
   boundsSize: {x: 20.1, y: 6, z: 20.1}
+  wallPrefab: {fileID: 7396109557337260494, guid: 05bcddfebc53d014792222f4ef29bfe1, type: 3}
   possibleEnemySpawns:
   - {x: -5.28, y: 0.01, z: -5.29}
   - {x: -5.28, y: 0, z: 7.02}
@@ -1239,7 +1240,6 @@ MonoBehaviour:
   itemLocations: []
   doorOffset: 0
   doorPrefab: {fileID: 7396109557337260494, guid: 7069e7e685873424db040d14b80a4a33, type: 3}
-  wallFillerPrefab: {fileID: 7396109557337260494, guid: 05bcddfebc53d014792222f4ef29bfe1, type: 3}
 --- !u!1 &9127159339092089534
 GameObject:
   m_ObjectHideFlags: 0

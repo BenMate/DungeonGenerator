@@ -13,7 +13,7 @@ public class DungeonGenerator : MonoBehaviour
     public bool forceCorriderMin = false;
 
     [Tooltip("The Amount of Corridor Space Between each Room")]
-    public int minRoomGap = 5;
+    public float minRoomGap = 5.5f;
 
     [Tooltip("The Total Length of the Corridors")]
     public int corridorLength = 10;
@@ -31,8 +31,8 @@ public class DungeonGenerator : MonoBehaviour
 
     [Header("GameObjects")]
     public GameObject corridorSegment;
-    public GameObject corridorEndSegment;
-
+    [Tooltip("Basically a room")]
+    public GameObject corridorIntersection;
 
     [Header("Debug")]
     [Range(0.0f, 1.0f)]
@@ -68,7 +68,6 @@ public class DungeonGenerator : MonoBehaviour
 
     public IEnumerator GenerateDungeon()
     {
-        // deletes dungeon if one laready exists
         DestroyAllChildren();
         CalculateCorridorLength();
 
@@ -76,7 +75,6 @@ public class DungeonGenerator : MonoBehaviour
         yield return StartCoroutine(GenerateRooms());
         yield return StartCoroutine(GenerateCorridors());
         yield return StartCoroutine(GenerateRoomDoors());
-
 
         print($"Total Generated Rooms : {totalRooms} \nTotal Generated Corridors : {nodeCount}");
     }
@@ -154,7 +152,6 @@ public class DungeonGenerator : MonoBehaviour
             foreach (Node leaf in leafNodes)
                 RemoveDeadEnd(leaf);
         }
-
     }
     IEnumerator GenerateRoom(Node node)
     {
@@ -164,13 +161,19 @@ public class DungeonGenerator : MonoBehaviour
         //generate the room if the array isnt empty
         if (node.isRoom && database.allRooms.Length != 0)
         {
-            DungeonRoom roomPrefab = Instantiate(database.allRooms[Random.Range(0, database.allRooms.Length)], node.position, Quaternion.identity, roomContainer.transform);
+            DungeonRoom room = Instantiate(database.allRooms[Random.Range(0, database.allRooms.Length)], node.position, Quaternion.identity, roomContainer.transform);
 
-            node.room = roomPrefab;
+            node.area = room;
 
-            roomPrefab.SpawnEnemyPrefabs(database.allEnemies, enemyContainer.transform);
-
+            room.SpawnEnemyPrefabs(database.allEnemies, enemyContainer.transform);
         }
+        else if (!node.isRoom && corridorIntersection != null)
+        {
+            DungeonArea intersection = Instantiate(corridorIntersection, node.position, Quaternion.identity, roomContainer.transform).GetComponent<DungeonArea>();
+
+            node.area = intersection;
+        }
+
         //loop through the children and invoke the funtcion
         foreach (Node child in node.children)
             yield return StartCoroutine(GenerateRoom(child));
@@ -192,11 +195,9 @@ public class DungeonGenerator : MonoBehaviour
                 Vector3 scale = database.allRooms[i].boundsSize;
 
                 if (scale.z > scale.x)
-                    maxLength = (int)(scale.z > maxLength ? scale.z + 5.5f : maxLength);
+                    maxLength = (int)(scale.z > maxLength ? scale.z + minRoomGap : maxLength);
                 else
-                    maxLength = (int)(scale.x > maxLength ? scale.x + 5.5f : maxLength);
-
-
+                    maxLength = (int)(scale.x > maxLength ? scale.x + minRoomGap : maxLength);
             }
             corridorLength = maxLength;
         }
@@ -216,12 +217,12 @@ public class DungeonGenerator : MonoBehaviour
             dir.Normalize();
 
             //set the node offset and size
-            Vector3 nodePosOffset = node.position + (node.isRoom ? node.room.boundsOffset : Vector3.zero);
-            Vector3 nodePosSize = node.isRoom ? node.room.boundsSize : Vector3.zero;
+            Vector3 nodePosOffset = node.position + node.area.boundsOffset;
+            Vector3 nodePosSize = node.area.boundsSize;
 
             //set the childs size and offset
-            Vector3 childPosOffset = child.position + (child.isRoom ? child.room.boundsOffset : Vector3.zero);
-            Vector3 childPosSize = child.isRoom ? child.room.boundsSize : Vector3.zero;
+            Vector3 childPosOffset = child.position + child.area.boundsOffset;
+            Vector3 childPosSize = child.area.boundsSize;
 
             //make the offset y = 0 to keep on the same level
             Vector3 nodeXZOffset = new Vector3(nodePosOffset.x, 0, nodePosOffset.z);
@@ -233,17 +234,11 @@ public class DungeonGenerator : MonoBehaviour
             //calculate where the offsets are
             Vector3 difference = nodeXZOffset - childXZOffSet;
 
-            //round difference to an abs
-            Vector3 differenceABS = new Vector3(Mathf.Abs(difference.x), Mathf.Abs(difference.y), Mathf.Abs(difference.z));
-            Vector3 differenceRoundedABS = new Vector3(Mathf.RoundToInt(differenceABS.x), Mathf.RoundToInt(differenceABS.y), Mathf.RoundToInt(differenceABS.z));
-
             float tempLength = 3;
 
             //spawn prefab
             if (corridorSegment != null)
             {
-                
-
                 //how many segments are needed to be placed and total length
                 float totalLength = (Vector3.Distance(difference, Vector3.zero));
                 int segmentCount = (int)(totalLength / tempLength);
@@ -267,22 +262,10 @@ public class DungeonGenerator : MonoBehaviour
                     segment.transform.localScale += new Vector3(scale.x, 0, scale.z);
 
                 }
-
-
-
-
-
-                //get which node to spawn at
-
-                //
-
             }
 
-            if (node.isRoom)
-                node.room.SetCorridorDirection(dir);
-
-            if (child.isRoom)
-                child.room.SetCorridorDirection(-dir);
+            node.area.SetCorridorDirection(dir);
+            child.area.SetCorridorDirection(-dir);
 
             yield return StartCoroutine(GenerateCorridor(child));
         }
@@ -295,7 +278,9 @@ public class DungeonGenerator : MonoBehaviour
             yield return new WaitForSeconds(1.0f - genSpeed);
 
         if (node.isRoom)
-            node.room.GenerateDoors();
+            (node.area as DungeonRoom).GenerateDoors();
+
+        node.area.GenerateWalls();
 
         foreach (Node child in node.children)
             yield return StartCoroutine(GenerateRoomDoor(child));
