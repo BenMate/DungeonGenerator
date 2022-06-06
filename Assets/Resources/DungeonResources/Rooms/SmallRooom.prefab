@@ -1237,7 +1237,7 @@ MonoBehaviour:
   maxEnemyCount: 3
   minEnemyCount: 1
   itemLocations: []
-  doorOffset: 0.135
+  doorOffset: 0
   doorPrefab: {fileID: 7396109557337260494, guid: 7069e7e685873424db040d14b80a4a33, type: 3}
   wallFillerPrefab: {fileID: 7396109557337260494, guid: 05bcddfebc53d014792222f4ef29bfe1, type: 3}
 --- !u!1 &9127159339092089534
