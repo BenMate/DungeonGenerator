@@ -8,6 +8,13 @@ namespace DungeonGenerator
     {
         //room generation
         [Header("Gen Config")]
+
+        [Tooltip("the seed is used for map generation, keeping the same seed will generate the same map")]
+        public int seed = 0;
+
+        [Tooltip("make the generation completely random each time")]
+        public bool randomSeed;
+
         [Tooltip("Can Corridors Lead to Nothing / special rooms")]
         public bool GenerateDeadEnds = false;
 
@@ -50,7 +57,7 @@ namespace DungeonGenerator
         public bool waitForGizmosGen = false;
 
         List<Node> deletedNodes = new List<Node>();
-        Dictionary<Vector3, Node> knownPositions = new();
+        Dictionary<Vector3, Node> knownPositions = new Dictionary<Vector3, Node>();
 
         Node root;
         Node currentNode;
@@ -65,19 +72,30 @@ namespace DungeonGenerator
         GameObject enemyContainer;
         GameObject corridorContainer;
         GameObject doorContainer;
+        GameObject itemContainer;
 
         void Start()
         {
-            Random.InitState(0);
+            if(randomSeed)
+           seed = GenerateRandomSeed();
+
+            Random.InitState(seed);
+
+            print($"The Seed used to create this dungeon : {seed}");
 
             roomContainer = new GameObject("Dungeon Rooms");
             enemyContainer = new GameObject("Dungeon Enemies");
             corridorContainer = new GameObject("Dungeon Corridors");
             doorContainer = new GameObject("Dungeon Doors");
-
+            itemContainer = new GameObject("Dungeon Items");
 
             database.LoadPrefabs();
             StartCoroutine(GenerateDungeon());
+        }
+
+        int GenerateRandomSeed()
+        {
+            return Random.Range(int.MinValue, int.MaxValue);
         }
 
         public IEnumerator GenerateDungeon()
@@ -192,6 +210,7 @@ namespace DungeonGenerator
 
                 if(bRoom.allowBossSpawns)
                 bRoom.SpawnEnemyPrefabs(database.allBosses, enemyContainer.transform);
+                bRoom.SpawnItemPrefabs(database.allItems, itemContainer.transform);
             }
 
             //generate the room if the array isnt empty
@@ -202,6 +221,7 @@ namespace DungeonGenerator
                 node.area = room;
 
                 room.SpawnEnemyPrefabs(database.allEnemies, enemyContainer.transform);
+                room.SpawnItemPrefabs(database.allItems, itemContainer.transform);
             }
 
             //generate corridorIntersection
@@ -211,7 +231,6 @@ namespace DungeonGenerator
 
                 node.area = intersection;
             }
-
 
             //loop through the children and invoke the funtcion
             foreach (Node child in node.children)
@@ -273,7 +292,7 @@ namespace DungeonGenerator
                 //calculate where the offsets are
                 Vector3 difference = nodeXZOffset - childXZOffSet;
 
-                float tempLength = 3;
+               float tempLength = 3;   //todo : bounds ===============================================================================================
 
                 //spawn segment Prefab
                 if (database.corridorSegment != null)
@@ -308,7 +327,6 @@ namespace DungeonGenerator
                         segment.transform.localScale += new Vector3(0, 0, scale.z * Mathf.Abs(Vector3.Distance(dir, Vector3.zero)));
                     }
                 }
-
                 node.area.SetCorridorDirection(dir);
                 child.area.SetCorridorDirection(-dir);
 
@@ -337,9 +355,7 @@ namespace DungeonGenerator
             while (transform.childCount != 0)
             {
                 foreach (Transform item in transform)
-                {
-                    DestroyImmediate(item.gameObject);
-                }
+                    DestroyImmediate(item.gameObject);    
             }
         }
         void RemoveDeadEnd(Node node)

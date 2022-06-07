@@ -328,15 +328,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83fff389a1e9c694b9e61f37c0788c00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  seed: 0
+  randomSeed: 1
   GenerateDeadEnds: 0
   minRoomGap: 5.5
   roomCount: 20
-  roomChance: 98
+  roomChance: 78
   CanBossRoomGenerate: 1
   multipleBossRooms: 0
   forceCorriderMin: 1
   corridorLength: 11
-  maxCorridorSegments: 50
+  maxCorridorSegments: 1
   CorridorRotationOffset: 0
   genSpeed: 1
   waitForGizmosGen: 0

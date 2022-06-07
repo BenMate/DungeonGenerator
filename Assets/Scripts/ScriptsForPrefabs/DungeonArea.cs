@@ -24,6 +24,7 @@ namespace DungeonGenerator
 
         protected bool left, right, back, forward;
 
+        //---------------- to remove into another script
         public void SetCorridorDirection(Vector3 direction)
         {
             if (direction == Vector3.left)
@@ -54,7 +55,7 @@ namespace DungeonGenerator
                 Instantiate(wallPrefab, transform.position + Vector3.right * boundsSize.x / 2 + wallPosOffset,
                    Quaternion.Euler(wallRotationOffset.x, 270 + wallRotationOffset.y, wallRotationOffset.z), parent.transform);
         }
-
+        //-----------------------
         public void CalculateBounds()
         {
             Bounds bounds = Encap(transform, new Bounds());

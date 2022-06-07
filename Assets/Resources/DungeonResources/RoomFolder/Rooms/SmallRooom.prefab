@@ -1237,11 +1237,19 @@ MonoBehaviour:
   - {x: -5.28, y: 0, z: 7.02}
   - {x: 5.8, y: 0.01, z: -5.32}
   - {x: 5.8, y: 0.01, z: 6.82}
+  allowBossSpawns: 0
+  allowEnemiesToSpawn: 1
   maxEnemyCount: 3
   minEnemyCount: 1
-  itemLocations: []
-  doorOffset: 0.05
+  gizmoSize: 0.2
+  itemLocations:
+  - {x: 0, y: 0, z: 0}
+  allowItemsToSpawn: 1
+  minItemCount: 0
+  maxItemCount: 1
   doorPrefab: {fileID: 7396109557337260494, guid: 7069e7e685873424db040d14b80a4a33, type: 3}
+  doorOffset: {x: 0, y: 0, z: 0}
+  doorRotationOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &9127159339092089534
 GameObject:
   m_ObjectHideFlags: 0
