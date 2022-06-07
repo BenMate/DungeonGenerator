@@ -4,19 +4,13 @@ using UnityEngine;
 
 public class DungeonGenerator : MonoBehaviour
 {
-    [Header("Config")]
-
+    //room generation
+    [Header("Gen Config")]
     [Tooltip("Can Corridors Lead to Nothing")]
     public bool GenerateDeadEnds = false;
 
-    [Tooltip("Clamps CorridorLength to Rooms Size, Helps Prevent Rooms from Touching")]
-    public bool forceCorriderMin = false;
-
     [Tooltip("The Amount of Corridor Space Between each Room")]
     public float minRoomGap = 5.5f;
-
-    [Tooltip("The Total Length of the Corridors")]
-    public int corridorLength = 10;
 
     [Tooltip("The Total Amount of Rooms that will be Generated (Big Numbers, Big Wait Time)")]
     [Range(0, 1000)]
@@ -26,14 +20,33 @@ public class DungeonGenerator : MonoBehaviour
     [Range(0, 100)]
     public int roomChance = 50;
 
+    //corridor
+    [Header("Corridor Config")]
+    [Tooltip("Clamps CorridorLength to Rooms Size, Helps Prevent Rooms from Touching")]
+    public bool forceCorriderMin = false;
+
+    [Tooltip("The Total Length of the Corridors")]
+    public int corridorLength = 10;
+
     [Tooltip("Max Amount of Times Rooms Can have Segments Between them")]
     public int maxCorridorSegments = 2;
 
-    [Header("GameObjects")]
+    [Tooltip("Changes the rotation of the corridors")]
+    public float CorridorRotationOffset;
+
+    //game objects
+    [Header("Corridor Objects")]
     public GameObject corridorSegment;
     [Tooltip("Basically a room")]
     public GameObject corridorIntersection;
 
+    [Header("Special Rooms")]
+    [Tooltip("The Room That Will Spawn a Special Enemy")]
+    public DungeonRoom bossRoom;
+    [Tooltip("The Beggening Room")]
+    public DungeonRoom spawnRoom;
+
+    //simple editor debugs
     [Header("Debug")]
     [Range(0.0f, 1.0f)]
     public float genSpeed = 1.0f;
@@ -41,7 +54,6 @@ public class DungeonGenerator : MonoBehaviour
 
     //node data
     List<Node> deletedNodes = new List<Node>();
-
     Dictionary<Vector3, Node> knownPositions = new Dictionary<Vector3, Node>();
 
     Node root;
@@ -158,8 +170,15 @@ public class DungeonGenerator : MonoBehaviour
         if (genSpeed < 1.0f)
             yield return new WaitForSeconds(1.0f - genSpeed);
 
+        //generate spawn room if they have provided a prefab
+        if (node.parent == null && spawnRoom != null)
+        {
+            DungeonRoom spawn = Instantiate(spawnRoom, node.position, Quaternion.identity, roomContainer.transform);
+            node.area = spawn;
+        }
+
         //generate the room if the array isnt empty
-        if (node.isRoom && database.allRooms.Length != 0)
+        else if (node.isRoom && database.allRooms.Length != 0)
         {
             DungeonRoom room = Instantiate(database.allRooms[Random.Range(0, database.allRooms.Length)], node.position, Quaternion.identity, roomContainer.transform);
 
@@ -236,7 +255,7 @@ public class DungeonGenerator : MonoBehaviour
 
             float tempLength = 3;
 
-            //spawn prefab
+            //spawn segment Prefab
             if (corridorSegment != null)
             {
                 //how many segments are needed to be placed and total length
@@ -257,9 +276,19 @@ public class DungeonGenerator : MonoBehaviour
 
                 for (int i = 0; i < segmentCount; i++)
                 {
-                    GameObject segment = Instantiate(corridorSegment, nodeXZOffset - dirOffset * i - dirOffset / 2, Quaternion.identity, transform);
+                    Quaternion angle = Quaternion.Euler(0, 0, 0);
+
+                    if (dir == Vector3.left || dir == Vector3.right)            
+                        angle = Quaternion.Euler(0, 90 + CorridorRotationOffset, 0);
+                    if (dir == Vector3.forward || dir == Vector3.back)
+                        angle = Quaternion.Euler(0, CorridorRotationOffset, 0);
+
+
+                        GameObject segment = Instantiate(corridorSegment, nodeXZOffset - dirOffset * i - dirOffset / 2, angle, transform);
                     Vector3 scale = segment.transform.localScale * (segmentScale / tempLength);
-                    segment.transform.localScale += new Vector3(scale.x, 0, scale.z);
+                    segment.transform.localScale += new Vector3(0, 0, scale.z * Mathf.Abs(Vector3.Distance(dir, Vector3.zero)));
+
+                    
 
                 }
             }

@@ -28,18 +28,18 @@ public class DungeonRoom : DungeonArea
     List<Vector3> posList = new List<Vector3>();
 
     public void GenerateDoors()
-    {
+    { 
         if (forward)
-            Instantiate(doorPrefab, transform.position + Vector3.forward * boundsSize.z / 2, Quaternion.Euler(0, 180, 0));
+            Instantiate(doorPrefab, transform.position + Vector3.forward * (boundsSize.z / 2 + doorOffset), Quaternion.Euler(0, 180, 0));
 
         if (back)
-            Instantiate(doorPrefab, transform.position + Vector3.back * boundsSize.z / 2, Quaternion.Euler(0, 0, 0));
+            Instantiate(doorPrefab, transform.position + Vector3.back * (boundsSize.z / 2 + doorOffset), Quaternion.Euler(0, 0, 0));
 
         if (left)
-            Instantiate(doorPrefab, transform.position + Vector3.left * boundsSize.x / 2, Quaternion.Euler(0, 90, 0));
+            Instantiate(doorPrefab, transform.position + Vector3.left * (boundsSize.x / 2 + doorOffset), Quaternion.Euler(0, 90, 0));
 
         if (right)
-            Instantiate(doorPrefab, transform.position + Vector3.right * boundsSize.x / 2, Quaternion.Euler(0, 270, 0));
+            Instantiate(doorPrefab, transform.position + Vector3.right * (boundsSize.x / 2 + doorOffset), Quaternion.Euler(0, 270, 0));
     }
 
     public void SpawnEnemyPrefabs(EnemyType[] enemies, Transform parent = null)

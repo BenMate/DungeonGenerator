@@ -5,12 +5,20 @@ using UnityEngine;
 public class DungeonArea : MonoBehaviour
 {
     [Header("Bounds Config")]
-    [Tooltip("The Bounds of the room, the corridors will scale to the bounds")]
+    [Tooltip("The Bounds offset")]
     public Vector3 boundsOffset = Vector3.zero;
+    [Tooltip("The Bounds size, the Corridors Will Scale to the Bounds")]
     public Vector3 boundsSize = Vector3.one;
 
+    [Header("Wall Config")]
     [Tooltip("Wall Prefab")]
+    //note needs to have an empty parent
     public GameObject wallPrefab;
+    [Tooltip("Adjusts the Position of the wall Spawn")]
+    public Vector3 wallPosOffset;
+
+    [Tooltip("Adjusts the Rotation of the Wall Spawn")]
+    public Vector3 wallRotationOffset;
 
     protected bool left, right, back, forward;
 
@@ -29,16 +37,20 @@ public class DungeonArea : MonoBehaviour
     public void GenerateWalls()
     {
         if (!forward)
-            Instantiate(wallPrefab, transform.position + Vector3.forward * boundsSize.z / 2, Quaternion.Euler(0, 180, 0));
+            Instantiate(wallPrefab, transform.position + Vector3.forward * boundsSize.z / 2 + wallPosOffset,
+                Quaternion.Euler(wallRotationOffset.x, 180 + wallRotationOffset.y, wallRotationOffset.z));
 
         if (!back)        
-            Instantiate(wallPrefab, transform.position + Vector3.back * boundsSize.z / 2, Quaternion.Euler(0, 0, 0));
+            Instantiate(wallPrefab, transform.position + Vector3.back * boundsSize.z / 2 + wallPosOffset, 
+                Quaternion.Euler(wallRotationOffset.x, wallRotationOffset.y, wallRotationOffset.z));
 
         if (!left)
-            Instantiate(wallPrefab, transform.position + Vector3.left * boundsSize.x / 2, Quaternion.Euler(0, 90, 0));
+            Instantiate(wallPrefab, transform.position + Vector3.left * boundsSize.x / 2 + wallPosOffset,
+                 Quaternion.Euler(wallRotationOffset.x, 90 + wallRotationOffset.y, wallRotationOffset.z));
 
         if (!right)     
-            Instantiate(wallPrefab, transform.position + Vector3.right * boundsSize.x / 2, Quaternion.Euler(0, 270, 0));
+            Instantiate(wallPrefab, transform.position + Vector3.right * boundsSize.x / 2 + wallPosOffset,
+               Quaternion.Euler(wallRotationOffset.x, 270 + wallRotationOffset.y, wallRotationOffset.z));
     }
 
     public void CalculateBounds()

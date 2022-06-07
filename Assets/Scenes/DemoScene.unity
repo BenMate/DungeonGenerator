@@ -329,14 +329,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GenerateDeadEnds: 0
-  forceCorriderMin: 1
   minRoomGap: 5.5
-  corridorLength: 11
   roomCount: 32
   roomChance: 59
+  forceCorriderMin: 1
+  corridorLength: 11
   maxCorridorSegments: 50
+  CorridorRotationOffset: 0
   corridorSegment: {fileID: 8041432648202843657, guid: 653b9d56a5dcd624cb0e427196a63e19, type: 3}
   corridorIntersection: {fileID: 8041432648202843657, guid: c30e0967087825a4b805766feadb7d47, type: 3}
+  bossRoom: {fileID: 3280313639123120088, guid: 9c8821d7cd9c4de4aa5cc905e303fa9e, type: 3}
+  spawnRoom: {fileID: 3280313639123120088, guid: 9c8821d7cd9c4de4aa5cc905e303fa9e, type: 3}
   genSpeed: 1
   waitForGizmosGen: 0
 --- !u!4 &1185741375

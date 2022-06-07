@@ -141,4 +141,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boundsOffset: {x: 0, y: 0, z: 0}
   boundsSize: {x: 3, y: 1, z: 3}
-  wallPrefab: {fileID: 1917435063043453426, guid: 5c0841548727f194f92116155f3ff846, type: 3}
+  wallPrefab: {fileID: 345646032827293499, guid: ec64cd117ec00b241811110f885a629c, type: 3}
+  wallPosOffset: {x: 0, y: 2, z: 0}
+  wallRotationOffset: {x: 0, y: 90, z: 0}
