@@ -32,7 +32,7 @@ namespace DungeonGenerator
         //boss rooms
         [Header("Special Room Config")]
         [Tooltip("Gives the Ability to Generate Boss Rooms")]
-        public bool CanBossRoomGenerate = true;
+        public bool canBossRoomGenerate = true;
 
         [Tooltip("Makes it Possible More Than One Boss Room can Spawn")]
         public bool multipleBossRooms = false;
@@ -229,20 +229,32 @@ namespace DungeonGenerator
             if (genSpeed < 1.0f)
                 yield return new WaitForSeconds(1.0f - genSpeed);
 
-            //generate spawn room if they have provided a prefab
-            if (node.parent == null && database.spawnDungeonRoom != null)
+            //generate spawn room if they have provided a prefab if not spawn a normal room
+            if (node.parent == null)
             {
-                DungeonRoom spawn = Instantiate(database.spawnDungeonRoom, node.position, Quaternion.identity, roomContainer.transform);
-                node.area = spawn;
+                if (database.spawnDungeonRoom != null)
+                {
+                    DungeonRoom spawn = Instantiate(database.spawnDungeonRoom, node.position, Quaternion.identity, roomContainer.transform);
+                    node.area = spawn;
+                }
+                else if (database.bossRooms.Length != 0)
+                {
+                    DungeonRoom room = Instantiate(database.allRooms[Random.Range(0, database.allRooms.Length)], node.position, Quaternion.identity, roomContainer.transform);
+                    node.area = room;
+
+                    room.SpawnEnemyPrefabs(database.allEnemies, enemyContainer.transform);
+                    room.SpawnItemPrefabs(database.allItems, itemContainer.transform);
+                }
+                
             }
 
             //dead ends can generate boss room
-            else if (node.children.Count == 0 && database.bossRooms.Length != 0 && CanBossRoomGenerate)
+            else if (node.children.Count == 0 && database.bossRooms.Length != 0 && canBossRoomGenerate)
             {
                 bossCount++;
 
                 if (!multipleBossRooms && bossCount > 0)
-                    CanBossRoomGenerate = false;
+                    canBossRoomGenerate = false;
 
                 DungeonRoom bRoom = Instantiate(database.bossRooms[Random.Range(0, database.bossRooms.Length)], node.position, Quaternion.identity, roomContainer.transform);
                 node.area = bRoom;
