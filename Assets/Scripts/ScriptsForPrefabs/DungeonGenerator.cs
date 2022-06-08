@@ -292,17 +292,17 @@ namespace DungeonGenerator
                 //calculate where the offsets are
                 Vector3 difference = nodeXZOffset - childXZOffSet;
 
-               float tempLength = 3;   //todo : bounds ===============================================================================================
+               float segmentSize = database.corridorSegment.GetComponent<BoundsGenerater>().boundsSize.z;  
 
                 //spawn segment Prefab
                 if (database.corridorSegment != null)
                 {
                     //how many segments are needed to be placed and total length
                     float totalLength = (Vector3.Distance(difference, Vector3.zero));
-                    int segmentCount = (int)(totalLength / tempLength);
+                    int segmentCount = (int)(totalLength / segmentSize);
 
                     //the total length of all segments
-                    float totalSegmentLength = segmentCount * tempLength;
+                    float totalSegmentLength = segmentCount * segmentSize;
 
                     //the remainder of length from the bounds 
                     float remainderLength = totalLength - totalSegmentLength;
@@ -310,7 +310,7 @@ namespace DungeonGenerator
                     //how much to scale each segment
                     float segmentScale = remainderLength / segmentCount;
 
-                    Vector3 dirOffset = difference.normalized * (tempLength + segmentScale);
+                    Vector3 dirOffset = difference.normalized * (segmentSize + segmentScale);
 
 
                     for (int i = 0; i < segmentCount; i++)
@@ -323,7 +323,7 @@ namespace DungeonGenerator
                             angle = Quaternion.Euler(0, CorridorRotationOffset, 0);
 
                         GameObject segment = Instantiate(database.corridorSegment, nodeXZOffset - dirOffset * i - dirOffset / 2, angle, corridorContainer.transform);
-                        Vector3 scale = segment.transform.localScale * (segmentScale / tempLength);
+                        Vector3 scale = segment.transform.localScale * (segmentScale / segmentSize);
                         segment.transform.localScale += new Vector3(0, 0, scale.z * Mathf.Abs(Vector3.Distance(dir, Vector3.zero)));
                     }
                 }

@@ -3,12 +3,12 @@ using UnityEditor;
 
 namespace DungeonGenerator
 {
-    [CustomEditor(typeof(DungeonArea), true)]
-    public class AreaEditor : Editor
+    [CustomEditor(typeof(BoundsGenerater), true)]
+    public class BoundsGeneraterEditor : Editor
     {
         public override void OnInspectorGUI()
         {
-            DungeonArea area = target as DungeonArea;
+            BoundsGenerater area = target as BoundsGenerater;
 
             if (GUILayout.Button("Auto Generate Bounds"))
                 area.CalculateBounds();
