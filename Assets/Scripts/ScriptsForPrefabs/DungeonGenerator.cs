@@ -7,13 +7,11 @@ namespace DungeonGenerator
     public class DungeonGenerator : MonoBehaviour
     {
         //room generation
-        [Header("Gen Config")]
-
         [Tooltip("the seed is used for map generation, keeping the same seed will generate the same map")]
         public int seed = 0;
 
         [Tooltip("make the generation completely random each time")]
-        public bool randomSeed;
+        public bool randomSeed = false;
 
         [Tooltip("Can Corridors Lead to Nothing / special rooms")]
         public bool GenerateDeadEnds = false;
@@ -25,40 +23,41 @@ namespace DungeonGenerator
         [Range(0, 1000)]
         public int roomCount = 5;
 
-        [Tooltip("The Chances of Generating a Room")]
+        [Tooltip("The Chances of Generating a Room in general")]
         [Range(0, 100)]
         public int roomChance = 50;
 
-        //boss rooms
-        [Header("Special Room Config")]
+        //special rooms
         [Tooltip("Gives the Ability to Generate Boss Rooms")]
         public bool canBossRoomGenerate = true;
 
         [Tooltip("Makes it Possible More Than One Boss Room can Spawn")]
         public bool multipleBossRooms = false;
 
+        [Tooltip("if you Want to use the Spawn Room")]
+        public bool useSpawnRoom = true;
+        /// <summary>
+        /// ///
+        /// </summary>
         //corridor
-        [Header("Corridor Config")]
-        [Tooltip("Clamps CorridorLength to Rooms Size, Helps Prevent Rooms from Touching")]
+        [Tooltip("Clamps Corridors Length to the Rooms Size, Helps Prevent Rooms from Touching")]
         public bool forceCorriderMin = false;
 
         [Tooltip("The Total Length of the Corridors")]
         public int corridorLength = 10;
 
-        [Tooltip("Max Amount of Times Rooms Can have Segments Between them")]
-        public int maxCorridorSegments = 2;
+        [Tooltip("Max Amount of Times Rooms Can have intersections Between them")]
+        public int maxCorridorIntersections = 2;
 
         [Tooltip("Changes the rotation of the corridors")]
         public float CorridorRotationOffset;
 
         //simple editor debugs
-        [Header("Debug")]
         [Range(0.0f, 1.0f)]
         public float genSpeed = 1.0f;
         public bool waitForGizmosGen = false;
 
-        //filepath test
-        [Header("FilePath Config")]
+        //filepath
         [Tooltip("Tick to Use the Default Filepaths, Untick to use Your Own")]
         public bool useDefaultFilePaths = true;
 
@@ -103,7 +102,6 @@ namespace DungeonGenerator
             StartCoroutine(GenerateDungeon());
             print($"The Seed used to create this dungeon : {seed}");
         }
-
         void GenerateFilePath()
         {
             //Once all strings are calculated use that path to load the prefabs
@@ -193,7 +191,7 @@ namespace DungeonGenerator
                 //generate a new position a parent and an ability to have a room.
                 Node newNode = new Node(newPos);
                 nodeCount++;
-                newNode.isRoom = Random.Range(0, 100) < roomChance || segmentCount >= maxCorridorSegments - 1;
+                newNode.isRoom = Random.Range(0, 100) < roomChance || segmentCount >= maxCorridorIntersections - 1;
                 currentNode.children.Add(newNode);
                 newNode.parent = currentNode;
 
@@ -232,7 +230,7 @@ namespace DungeonGenerator
             //generate spawn room if they have provided a prefab if not spawn a normal room
             if (node.parent == null)
             {
-                if (database.spawnDungeonRoom != null)
+                if (database.spawnDungeonRoom != null && useSpawnRoom)
                 {
                     DungeonRoom spawn = Instantiate(database.spawnDungeonRoom, node.position, Quaternion.identity, roomContainer.transform);
                     node.area = spawn;

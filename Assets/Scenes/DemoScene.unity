@@ -333,17 +333,18 @@ MonoBehaviour:
   GenerateDeadEnds: 0
   minRoomGap: 5.5
   roomCount: 20
-  roomChance: 78
-  CanBossRoomGenerate: 1
+  roomChance: 100
+  canBossRoomGenerate: 1
   multipleBossRooms: 0
+  useSpawnRoom: 1
   forceCorriderMin: 1
-  corridorLength: 11
-  maxCorridorSegments: 1
+  corridorLength: 115
+  maxCorridorIntersections: 2
   CorridorRotationOffset: 0
   genSpeed: 1
-  waitForGizmosGen: 0
+  waitForGizmosGen: 1
   useDefaultFilePaths: 1
-  roomsFilepath: 
+  roomsFilepath: folder/resources/bin
   enemiesFilepath: 
   bossRoomFilepath: 
   itemsFilepath: 
