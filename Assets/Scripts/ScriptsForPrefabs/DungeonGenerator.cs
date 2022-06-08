@@ -29,6 +29,7 @@ namespace DungeonGenerator
         [Range(0, 100)]
         public int roomChance = 50;
 
+        //boss rooms
         [Header("Special Room Config")]
         [Tooltip("Gives the Ability to Generate Boss Rooms")]
         public bool CanBossRoomGenerate = true;
@@ -56,6 +57,21 @@ namespace DungeonGenerator
         public float genSpeed = 1.0f;
         public bool waitForGizmosGen = false;
 
+        //filepath test
+        [Header("FilePath Config")]
+        [Tooltip("Tick to Use the Default Filepaths, Untick to use Your Own")]
+        public bool useDefaultFilePaths = true;
+
+        public string roomsFilepath;
+        public string enemiesFilepath;
+        public string bossRoomFilepath;
+        public string itemsFilepath;
+        public string bossEnemiesFilepath;
+
+        public string spawnRoomFilepath;
+        public string corridorIntersectionFilepath;
+        public string corridorSegmentsFilepath;
+
         List<Node> deletedNodes = new List<Node>();
         Dictionary<Vector3, Node> knownPositions = new Dictionary<Vector3, Node>();
 
@@ -76,21 +92,42 @@ namespace DungeonGenerator
 
         void Start()
         {
-            if(randomSeed)
-           seed = GenerateRandomSeed();
+            GenerateFilePath();
 
+            if (randomSeed)
+                seed = GenerateRandomSeed();
             Random.InitState(seed);
 
-            print($"The Seed used to create this dungeon : {seed}");
+            GenerateContainers();
 
+            StartCoroutine(GenerateDungeon());
+            print($"The Seed used to create this dungeon : {seed}");
+        }
+
+        void GenerateFilePath()
+        {
+            //Once all strings are calculated use that path to load the prefabs
+
+            database.rooms = useDefaultFilePaths ? database.defaultRoomsPath : roomsFilepath;
+            database.enemies = useDefaultFilePaths ? database.defaultEnemiesPath : enemiesFilepath;
+            database.bossRoom = useDefaultFilePaths ? database.defaultbossRoomPath : bossRoomFilepath;
+            database.items = useDefaultFilePaths ? database.defaultItemsPath : itemsFilepath;
+            database.bossEnemies = useDefaultFilePaths ? database.defaultBossEnemiesPath : bossEnemiesFilepath;
+
+            database.spawnRoom = useDefaultFilePaths ? database.defaultSpawnRoomPath : spawnRoomFilepath;
+            database.corridorIntersection = useDefaultFilePaths ? database.defaultCorridorIntersectionPath : corridorIntersectionFilepath;
+            database.corridorSegments = useDefaultFilePaths ? database.defaultCorridorSegmentPath : corridorSegmentsFilepath;
+
+            database.LoadPrefabs();
+        }
+
+        void GenerateContainers()
+        {
             roomContainer = new GameObject("Dungeon Rooms");
             enemyContainer = new GameObject("Dungeon Enemies");
             corridorContainer = new GameObject("Dungeon Corridors");
             doorContainer = new GameObject("Dungeon Doors");
             itemContainer = new GameObject("Dungeon Items");
-
-            database.LoadPrefabs();
-            StartCoroutine(GenerateDungeon());
         }
 
         int GenerateRandomSeed()
@@ -127,7 +164,7 @@ namespace DungeonGenerator
         IEnumerator GenerateNodes()
         {
             //add a root node, also add to known positions
-            root = new Node(Vector3.zero);
+            root = new Node(gameObject.transform.position);
             knownPositions.Add(root.position, root);
             currentNode = root;
 
@@ -140,8 +177,10 @@ namespace DungeonGenerator
                 if (genSpeed < 1.0f && waitForGizmosGen)
                     yield return new WaitForSeconds(1.0f - genSpeed);
 
+                //Get a random direction, distance and hieght to go to.
                 Vector3 randDir = Direction3D.GetRandomDirectionXZ();
                 Vector3 newPos = currentNode.position + randDir * corridorLength;
+                newPos.y = gameObject.transform.position.y;
 
                 //check if the currentNode moved back onto an existing node if so, dont add a room.
                 if (knownPositions.ContainsKey(newPos))
@@ -191,9 +230,9 @@ namespace DungeonGenerator
                 yield return new WaitForSeconds(1.0f - genSpeed);
 
             //generate spawn room if they have provided a prefab
-            if (node.parent == null && database.spawnRoom != null)
+            if (node.parent == null && database.spawnDungeonRoom != null)
             {
-                DungeonRoom spawn = Instantiate(database.spawnRoom, node.position, Quaternion.identity, roomContainer.transform);
+                DungeonRoom spawn = Instantiate(database.spawnDungeonRoom, node.position, Quaternion.identity, roomContainer.transform);
                 node.area = spawn;
             }
 
@@ -208,8 +247,8 @@ namespace DungeonGenerator
                 DungeonRoom bRoom = Instantiate(database.bossRooms[Random.Range(0, database.bossRooms.Length)], node.position, Quaternion.identity, roomContainer.transform);
                 node.area = bRoom;
 
-                if(bRoom.allowBossSpawns)
-                bRoom.SpawnEnemyPrefabs(database.allBosses, enemyContainer.transform);
+                if (bRoom.allowBossSpawns)
+                    bRoom.SpawnEnemyPrefabs(database.allBosses, enemyContainer.transform);
                 bRoom.SpawnItemPrefabs(database.allItems, itemContainer.transform);
             }
 
@@ -225,9 +264,9 @@ namespace DungeonGenerator
             }
 
             //generate corridorIntersection
-            else if (!node.isRoom && database.corridorIntersection != null)
+            else if (!node.isRoom && database.corridorDungeonIntersection != null)
             {
-                DungeonArea intersection = Instantiate(database.corridorIntersection, node.position, Quaternion.identity, roomContainer.transform).GetComponent<DungeonArea>();
+                DungeonArea intersection = Instantiate(database.corridorDungeonIntersection, node.position, Quaternion.identity, roomContainer.transform).GetComponent<DungeonArea>();
 
                 node.area = intersection;
             }
@@ -283,19 +322,19 @@ namespace DungeonGenerator
                 Vector3 childPosSize = child.area.boundsSize;
 
                 //make the offset y = 0 to keep on the same level
-                Vector3 nodeXZOffset = new Vector3(nodePosOffset.x, 0, nodePosOffset.z);
+                Vector3 nodeXZOffset = new Vector3(nodePosOffset.x, gameObject.transform.position.y, nodePosOffset.z);
                 nodeXZOffset += Vector3.Scale(dir, nodePosSize) / 2;
 
                 childPosOffset += Vector3.Scale(-dir, childPosSize) / 2;
-                Vector3 childXZOffSet = new Vector3(childPosOffset.x, 0, childPosOffset.z);
+                Vector3 childXZOffSet = new Vector3(childPosOffset.x, gameObject.transform.position.y, childPosOffset.z);
 
                 //calculate where the offsets are
                 Vector3 difference = nodeXZOffset - childXZOffSet;
 
-               float segmentSize = database.corridorSegment.GetComponent<BoundsGenerater>().boundsSize.z;  
+                float segmentSize = database.CorridorDungeonSegments.GetComponent<BoundsGenerater>().boundsSize.z;
 
                 //spawn segment Prefab
-                if (database.corridorSegment != null)
+                if (database.CorridorDungeonSegments != null)
                 {
                     //how many segments are needed to be placed and total length
                     float totalLength = (Vector3.Distance(difference, Vector3.zero));
@@ -322,7 +361,7 @@ namespace DungeonGenerator
                         if (dir == Vector3.forward || dir == Vector3.back)
                             angle = Quaternion.Euler(0, CorridorRotationOffset, 0);
 
-                        GameObject segment = Instantiate(database.corridorSegment, nodeXZOffset - dirOffset * i - dirOffset / 2, angle, corridorContainer.transform);
+                        BoundsGenerater segment = Instantiate(database.CorridorDungeonSegments, nodeXZOffset - dirOffset * i - dirOffset / 2, angle, corridorContainer.transform);
                         Vector3 scale = segment.transform.localScale * (segmentScale / segmentSize);
                         segment.transform.localScale += new Vector3(0, 0, scale.z * Mathf.Abs(Vector3.Distance(dir, Vector3.zero)));
                     }
@@ -355,7 +394,7 @@ namespace DungeonGenerator
             while (transform.childCount != 0)
             {
                 foreach (Transform item in transform)
-                    DestroyImmediate(item.gameObject);    
+                    DestroyImmediate(item.gameObject);
             }
         }
         void RemoveDeadEnd(Node node)

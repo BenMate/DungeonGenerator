@@ -6,28 +6,55 @@ namespace DungeonGenerator
 {
     public class PrefabDatabase
     {
+        //Objects inside filePaths
         public DungeonRoom[] allRooms;
         public GameObject[] allEnemies;
         public GameObject[] allBosses;
         public DungeonRoom[] bossRooms;
         public GameObject[] allItems;
 
-        public DungeonRoom spawnRoom;
-        public DungeonArea corridorIntersection;
-        public GameObject corridorSegment;
+        public DungeonRoom spawnDungeonRoom;
+        public DungeonArea corridorDungeonIntersection;
+        public BoundsGenerater CorridorDungeonSegments;
+
+        //custom filePaths
+
+        public string rooms;
+        public string enemies;
+        public string bossRoom;
+        public string items;
+        public string bossEnemies;
+
+        public string spawnRoom;
+        public string corridorIntersection; 
+        public string corridorSegments;
+
+        //default filePaths 
+
+        public string defaultRoomsPath = "DungeonResources/RoomFolder/Rooms";
+        public string defaultEnemiesPath = "DungeonResources/Enemies/Enemies";
+        public string defaultbossRoomPath = "DungeonResources/RoomFolder/BossRoom";
+        public string defaultItemsPath = "DungeonResources/Items";
+        public string defaultBossEnemiesPath = "DungeonResources/Enemies/BossEnemy";
+
+        public string defaultSpawnRoomPath = "DungeonResources/RoomFolder/SpawnRoom";
+        public string defaultCorridorIntersectionPath = "DungeonResources/RoomFolder/CorridorIntersection";
+        public string defaultCorridorSegmentPath = "DungeonResources/RoomFolder/CorridorSegments";
 
         public void LoadPrefabs()
         {
-            allRooms = Resources.LoadAll<DungeonRoom>("DungeonResources/RoomFolder/Rooms");
-            allEnemies = Resources.LoadAll<GameObject>("DungeonResources/Enemies/Enemies");
-            bossRooms = Resources.LoadAll<DungeonRoom>("DungeonResources/RoomFolder/BossRoom");
-            allItems = Resources.LoadAll<GameObject>("DungeonResources/Items");
-            allBosses = Resources.LoadAll<GameObject>("DungeonResources/Enemies/BossEnemy");
+            allRooms = Resources.LoadAll<DungeonRoom>(rooms);
+            allEnemies = Resources.LoadAll<GameObject>(enemies);
+            bossRooms = Resources.LoadAll<DungeonRoom>(bossRoom);
+            allItems = Resources.LoadAll<GameObject>(items);
+            allBosses = Resources.LoadAll<GameObject>(bossEnemies);
 
-            spawnRoom = Resources.LoadAll<DungeonRoom>("DungeonResources/RoomFolder/SpawnRoom")[0];
-            corridorIntersection = Resources.LoadAll<DungeonArea>("DungeonResources/RoomFolder/CorridorIntersection")[0];
-            corridorSegment = Resources.LoadAll<GameObject>("DungeonResources/RoomFolder/CorridorSegments")[0];
+            //there has to be rooms, corridors and intsersections prefabs for the dungeon to work
+            spawnDungeonRoom = Resources.LoadAll<DungeonRoom>(spawnRoom)[0];
+            corridorDungeonIntersection = Resources.LoadAll<DungeonArea>(corridorIntersection)[0];
+            CorridorDungeonSegments = Resources.LoadAll<BoundsGenerater>(corridorSegments)[0];
 
+            //Objects in an array
             if (allRooms.Length == 0)
                 Debug.Log("PrefabDatabase - Could not find any Room Prefabs with 'DungeonRoom' Scirpt Attaced - Inside 'Rooms' folder ");
             if (allEnemies.Length == 0)
@@ -39,12 +66,12 @@ namespace DungeonGenerator
             if (allBosses.Length == 0)
                 Debug.Log("PrefabDatabase - Could not find any Boss Enemy Prefabs - Inside 'BossEnemy' Folder");
 
-
-            if (spawnRoom == null)
+            //single objects
+            if (spawnDungeonRoom == null)
                 Debug.Log("PrefabDatabase - Could not find any Room Prefabs with 'DungeonRoom' Scirpt Attaced - Inside 'SpawnRoom' Folder");
-            if (corridorSegment == null)
-                Debug.Log("PrefabDatabase - Could not Find a 'GameObject' - Inside 'CorridorSegments' Folder");
-            if (corridorIntersection == null)
+            if (CorridorDungeonSegments == null)
+                Debug.Log("PrefabDatabase - Could not find any CorridorSegment Prefab with 'BoundsGenerator' Scirpt Attaced - Inside 'CorridorSegment' Folder");
+            if (corridorDungeonIntersection == null)
                 Debug.Log("PrefabDatabase - Could not Find a 'GameObject' - Inside 'CorridorIntersection' Folder");
         }
     }

@@ -235,17 +235,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7371c9f0270e6214283a0788e18f1d82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundsOffset: {x: 0, y: 2, z: 0}
+  boundsOffset: {x: -0.007701874, y: 2, z: 0.0066013336}
   boundsSize: {x: 80.1988, y: 8, z: 40.201004}
   wallPrefab: {fileID: 7396109557337260494, guid: f74c1040b50f57547b743bda2e0adb19, type: 3}
+  wallPosOffset: {x: 0, y: 0, z: 0}
+  wallRotationOffset: {x: 0, y: 0, z: 0}
   possibleEnemySpawns:
   - {x: -20.97, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
+  allowBossSpawns: 0
+  allowEnemiesToSpawn: 1
   maxEnemyCount: 3
   minEnemyCount: 0
+  gizmoSize: 0.2
   itemLocations: []
-  doorOffset: 0.135
+  allowItemsToSpawn: 1
+  minItemCount: 0
+  maxItemCount: 0
   doorPrefab: {fileID: 7396109557337260494, guid: adce781b712bb234c96efc76c92673d0, type: 3}
+  doorOffset: {x: 0, y: 0, z: 0}
+  doorRotationOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &1520521021222920414
 GameObject:
   m_ObjectHideFlags: 0

@@ -1245,7 +1245,7 @@ MonoBehaviour:
   itemLocations:
   - {x: 0, y: 0, z: 0}
   allowItemsToSpawn: 1
-  minItemCount: 0
+  minItemCount: 1
   maxItemCount: 1
   doorPrefab: {fileID: 7396109557337260494, guid: 7069e7e685873424db040d14b80a4a33, type: 3}
   doorOffset: {x: 0, y: 0, z: 0}

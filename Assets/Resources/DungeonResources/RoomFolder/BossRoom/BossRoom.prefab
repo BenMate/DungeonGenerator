@@ -1139,10 +1139,15 @@ MonoBehaviour:
   wallRotationOffset: {x: 0, y: 0, z: 0}
   possibleEnemySpawns:
   - {x: 0, y: 0, z: 0}
+  allowBossSpawns: 1
+  allowEnemiesToSpawn: 1
   maxEnemyCount: 1
   minEnemyCount: 1
-  allowBossSpawns: 1
+  gizmoSize: 0.2
   itemLocations: []
+  allowItemsToSpawn: 1
+  minItemCount: 0
+  maxItemCount: 0
   doorPrefab: {fileID: 7396109557337260494, guid: adce781b712bb234c96efc76c92673d0, type: 3}
   doorOffset: {x: 0, y: 0, z: 0}
   doorRotationOffset: {x: 0, y: 0, z: 0}
