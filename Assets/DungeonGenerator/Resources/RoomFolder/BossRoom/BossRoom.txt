@@ -1,0 +1,6 @@
+Place A 'Boss Room' Prefab Inside this Folder, Attached the 'Dungeon room' Script and it will Add it to a list to be used inside the Dungeon Generator.
+
+Note:
+The database script will only find prefabs with the correct scripts attached.
+The Boss Room will generate when there are no more rooms connected to it.
+If you enable dead ends and the ability to have more then one boss room, all dead ends will become boss rooms.

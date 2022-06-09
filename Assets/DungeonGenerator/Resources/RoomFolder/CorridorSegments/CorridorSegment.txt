@@ -1,0 +1,6 @@
+Place A 'Corridor Segment' Prefab Inside this Folder, Attached the 'Bounds Generator' Script and it will Add it to a list to be used inside the Dungeon Generator.
+
+Note:
+The database script will only find prefabs with the correct scripts attached.
+Segments will be placed as a hallways between each room.
+The amount of segments placed depends on the totalLength

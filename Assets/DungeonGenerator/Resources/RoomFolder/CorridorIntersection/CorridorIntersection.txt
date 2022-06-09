@@ -1,0 +1,5 @@
+Place A 'Corridor Intersection' Prefab Inside this Folder, Attached the 'Dungeon Area' Script and it will Add it to a list to be used inside the Dungeon Generator.
+
+Note:
+The database script will only find prefabs with the correct scripts attached.
+The Intersection is basically a small room the size of the segment, it acts as a connector for the corridors

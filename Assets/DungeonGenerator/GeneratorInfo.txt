@@ -1,0 +1,13 @@
+Thank you for using This Procedural Generator.
+
+Resource Folder - Store your prefabs in the correct folder Inside
+
+Scripts - Attached the correct Scripts on the Correct Prefabs
+
+Note:
+You can Change the filepath if you want to create your own folders.
+
+Empty Object - DungeonGenerator (will spawn on the hieght of this object)
+Rooms - Dungeon Rooms.
+CorridorSegment - Bounds Generator.
+CorridorIntersection - Bounds Area.

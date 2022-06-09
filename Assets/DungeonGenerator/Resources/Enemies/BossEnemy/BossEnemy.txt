@@ -1,0 +1,5 @@
+Place All 'Boss Enemy' Prefabs Inside this Folder. It will add it to a list to be used inside the Dungeon Generator.
+
+Note:
+This is a special Enemy dedicated to spawn in the boss rooms, however you can spawn Bosses in normal Rooms.
+

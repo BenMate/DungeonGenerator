@@ -1,0 +1,5 @@
+Place all 'Room' Prefabs Inside this Folder, Attached the 'Dungeon room' Script and it will Add it to a list to be used inside the Dungeon Generator.
+
+Note:
+The database script will only find prefabs with the correct scripts attached.
+Rooms will be chosen at random each time the Dungeon Generator chooses to spawn a room.

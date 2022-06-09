@@ -1,0 +1,5 @@
+Place All 'Enemy' Prefabs Inside this Folder. It will add it to a list to be used inside the Dungeon Generator.
+
+Note:
+You tell each room how many enemies to spawn and where.
+Items Prefabs are just GameObjects.

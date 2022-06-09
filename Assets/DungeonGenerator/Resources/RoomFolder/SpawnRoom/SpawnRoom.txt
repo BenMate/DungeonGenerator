@@ -1,0 +1,5 @@
+Place A 'Spawn Room' Prefab Inside this Folder, Attached the 'Dungeon room' Script and it will Add it to a list to be used inside the Dungeon Generator.
+
+Note:
+The database script will only find prefabs with the correct scripts attached.
+The spawn room will only generate once.
