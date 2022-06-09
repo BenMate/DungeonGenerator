@@ -31,15 +31,15 @@ namespace DungeonGenerator
 
         //default filePaths 
 
-        public string defaultRoomsPath = "DungeonResources/RoomFolder/Rooms";
-        public string defaultEnemiesPath = "DungeonResources/Enemies/Enemies";
-        public string defaultbossRoomPath = "DungeonResources/RoomFolder/BossRoom";
-        public string defaultItemsPath = "DungeonResources/Items";
-        public string defaultBossEnemiesPath = "DungeonResources/Enemies/BossEnemy";
+        public string defaultRoomsPath = "RoomFolder/Rooms";
+        public string defaultEnemiesPath = "Enemies/Enemies";
+        public string defaultbossRoomPath = "RoomFolder/BossRoom";
+        public string defaultItemsPath = "Items";
+        public string defaultBossEnemiesPath = "Enemies/BossEnemy";
 
-        public string defaultSpawnRoomPath = "DungeonResources/RoomFolder/SpawnRoom";
-        public string defaultCorridorIntersectionPath = "DungeonResources/RoomFolder/CorridorIntersection";
-        public string defaultCorridorSegmentPath = "DungeonResources/RoomFolder/CorridorSegments";
+        public string defaultSpawnRoomPath = "RoomFolder/SpawnRoom";
+        public string defaultCorridorIntersectionPath = "RoomFolder/CorridorIntersection";
+        public string defaultCorridorSegmentPath = "RoomFolder/CorridorSegments";
 
         public void LoadPrefabs()
         {

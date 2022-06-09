@@ -344,7 +344,7 @@ MonoBehaviour:
   genSpeed: 1
   waitForGizmosGen: 1
   useDefaultFilePaths: 1
-  roomsFilepath: folder/resources/bin
+  roomsFilepath: 
   enemiesFilepath: 
   bossRoomFilepath: 
   itemsFilepath: 

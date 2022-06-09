@@ -1,0 +1,8 @@
+dungeon area missing auto bounds button
+
+doors dont have a gizmo to show where they automatically go
+
+need to put editor script outside everything to work
+
+
+resource folder might be the same it is
