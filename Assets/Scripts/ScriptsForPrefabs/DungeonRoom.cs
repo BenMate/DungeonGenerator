@@ -49,6 +49,9 @@ namespace DungeonGenerator
 
         public void GenerateDoors(Transform parent = null)
         {
+            if (doorPrefab == null)
+                return;
+
             if (forward)
                 Instantiate(doorPrefab, transform.position + Vector3.forward * boundsSize.z / 2 + doorOffset, Quaternion.Euler(doorRotationOffset.x, doorRotationOffset.y + 180, doorRotationOffset.z), parent.transform);
 

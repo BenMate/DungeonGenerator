@@ -6,3 +6,8 @@ need to put editor script outside everything to work
 
 
 resource folder might be the same it is
+
+
+auto length needs to also know about spawns length aswell....
+
+if door prefab  = null return;

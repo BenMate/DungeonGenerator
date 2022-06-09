@@ -31,6 +31,9 @@ namespace DungeonGenerator
 
         public void GenerateWalls(Transform parent = null)
         {
+            if (wallPrefab == null)
+                return;
+
             if (!forward)
                 Instantiate(wallPrefab, transform.position + Vector3.forward * boundsSize.z / 2 + wallPosOffset,
                     Quaternion.Euler(wallRotationOffset.x, 180 + wallRotationOffset.y, wallRotationOffset.z), parent.transform);
