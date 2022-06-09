@@ -30,6 +30,9 @@ namespace DungeonGenerator
             if (GUI.changed)
                 EditorUtility.SetDirty(bounds);
 
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("boundsOffset"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("boundsSize"));
+
             EditorGUILayout.Space();
 
             //add a dropdown tap to edit inspector
