@@ -7,7 +7,6 @@ namespace DungeonGenerator
     public class DungeonRoom : DungeonArea
     {
         //enemy config
-        [Header("Enemys Config - Red Gizmo")]
         [Tooltip("Create a list of possible enemy spawns")]
         public List<Vector3> possibleEnemySpawns = new List<Vector3>();
 
@@ -26,7 +25,6 @@ namespace DungeonGenerator
         public float gizmoSize = 0.2f;
 
         //items
-        [Header("Item Config - Cyan Gizmo")]
         [Tooltip("List of Item Spawn Locations")]
         public List<Vector3> itemLocations = new List<Vector3>();
 
@@ -40,7 +38,6 @@ namespace DungeonGenerator
         public int maxItemCount;
 
         //doors
-        [Header("Door Config")]
         [Tooltip("The door will spawn on the edge. All Doors are the same size")]
         public GameObject doorPrefab;
         [Tooltip("Changes the Offset of the Doors Spawn")]
@@ -127,7 +124,7 @@ namespace DungeonGenerator
             {
                 Vector3 itemPos = new Vector3(itemLocations[i].x, itemLocations[i].y, itemLocations[i].z);
                 Gizmos.DrawSphere(transform.position + itemPos, gizmoSize);
-            }
+            } 
         }
     }
 }

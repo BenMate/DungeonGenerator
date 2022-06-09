@@ -3,7 +3,7 @@ using UnityEditor;
 
 namespace DungeonGenerator
 {
-    [CustomEditor(typeof(BoundsGenerater), true)]
+    [CustomEditor(typeof(BoundsGenerater))]
     public class BoundsGeneraterEditor : Editor
     {
         public override void OnInspectorGUI()

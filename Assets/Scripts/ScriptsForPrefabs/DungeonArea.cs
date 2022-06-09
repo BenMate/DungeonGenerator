@@ -6,7 +6,6 @@ namespace DungeonGenerator
 {
     public class DungeonArea : BoundsGenerater
     {
-        [Header("Wall Config")]
         [Tooltip("Wall Prefab")]
         //note needs to have an empty parent
         public GameObject wallPrefab;

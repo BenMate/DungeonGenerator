@@ -1237,13 +1237,12 @@ MonoBehaviour:
   - {x: -5.28, y: 0, z: 7.02}
   - {x: 5.8, y: 0.01, z: -5.32}
   - {x: 5.8, y: 0.01, z: 6.82}
-  allowBossSpawns: 0
+  allowBossSpawns: 1
   allowEnemiesToSpawn: 1
-  maxEnemyCount: 3
-  minEnemyCount: 1
+  maxEnemyCount: 4
+  minEnemyCount: 4
   gizmoSize: 0.2
-  itemLocations:
-  - {x: 0, y: 0, z: 0}
+  itemLocations: []
   allowItemsToSpawn: 1
   minItemCount: 1
   maxItemCount: 1

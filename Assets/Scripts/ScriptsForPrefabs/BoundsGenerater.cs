@@ -8,7 +8,7 @@ namespace DungeonGenerator
     public class BoundsGenerater : MonoBehaviour
     {
         [Header("Bounds Config")]
-        [Tooltip("The Bounds offset be careful, as it will change the position of the bounds")]
+        [Tooltip("The Bounds offset, be careful as it will change the position of the bounds")]
         public Vector3 boundsOffset = Vector3.zero;
         [Tooltip("Segments only need to know the Bounds 'Z' Size, Corridors will scale towards the Rooms Bounds so make sure its accurate")]
         public Vector3 boundsSize = Vector3.one;
